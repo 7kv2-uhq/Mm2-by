@@ -1,1 +1,207 @@
-menu
+--[[
+    🔥 MENU - Interface graphique
+    À exécuter en deuxième
+]]
+
+print("   📦 [MENU] Création de l'interface...")
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+
+-- ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ESPPanel"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
+
+-- ===== LOGO =====
+local logoBtn = Instance.new("TextButton")
+logoBtn.Size = UDim2.new(0, 55, 0, 55)
+logoBtn.Position = UDim2.new(1, -70, 0, 15)
+logoBtn.Text = "⚡"
+logoBtn.TextColor3 = Color3.fromRGB(255, 220, 50)
+logoBtn.TextSize = 32
+logoBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+logoBtn.BackgroundTransparency = 0
+logoBtn.BorderSizePixel = 0
+logoBtn.Font = Enum.Font.GothamBold
+logoBtn.Parent = screenGui
+logoBtn.ZIndex = 999
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(1, 0)
+corner.Parent = logoBtn
+
+logoBtn.MouseEnter:Connect(function()
+    logoBtn.Size = UDim2.new(0, 60, 0, 60)
+end)
+logoBtn.MouseLeave:Connect(function()
+    logoBtn.Size = UDim2.new(0, 55, 0, 55)
+end)
+
+-- ===== DRAG =====
+local isDragging = false
+local dragStart = nil
+local startPos = nil
+
+logoBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDragging = true
+        dragStart = input.Position
+        startPos = logoBtn.Position
+    end
+end)
+
+logoBtn.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDragging = false
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        local newX = startPos.X.Scale + (delta.X / screenGui.AbsoluteSize.X)
+        local newY = startPos.Y.Scale + (delta.Y / screenGui.AbsoluteSize.Y)
+        
+        newX = math.clamp(newX, 0, 1 - logoBtn.Size.X.Scale)
+        newY = math.clamp(newY, 0, 1 - logoBtn.Size.Y.Scale)
+        
+        logoBtn.Position = UDim2.new(newX, 0, newY, 0)
+    end
+end)
+
+-- ===== MENU =====
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 260, 0, 280)
+mainFrame.Position = UDim2.new(1, -275, 0, 80)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
+mainFrame.BackgroundTransparency = 0
+mainFrame.BorderSizePixel = 0
+mainFrame.Visible = false
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+mainFrame.ZIndex = 998
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.Parent = mainFrame
+
+-- Bandeau
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 38)
+topBar.BackgroundColor3 = Color3.fromRGB(55, 55, 80)
+topBar.BorderSizePixel = 0
+topBar.Parent = mainFrame
+
+local topCorner = Instance.new("UICorner")
+topCorner.CornerRadius = UDim.new(0, 12)
+topCorner.Parent = topBar
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -40, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.Text = "⚡ ESP PANEL"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextSize = 17
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = topBar
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 32, 0, 32)
+closeBtn.Position = UDim2.new(1, -38, 0, 3)
+closeBtn.Text = "✕"
+closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+closeBtn.BackgroundTransparency = 1
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 18
+closeBtn.Parent = topBar
+
+closeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+end)
+
+-- ===== BOUTONS =====
+local buttons = {}
+local btnData = {
+    {name = "ESP Players", y = 48, color = Color3.fromRGB(200, 40, 40)},
+    {name = "ESP Weapons", y = 96, color = Color3.fromRGB(40, 200, 40)},
+    {name = "Show Distance", y = 144, color = Color3.fromRGB(40, 80, 200)},
+    {name = "ESP ALL", y = 192, color = Color3.fromRGB(200, 160, 40)},
+}
+
+for _, data in ipairs(btnData) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.9, 0, 0, 38)
+    btn.Position = UDim2.new(0.05, 0, 0, data.y)
+    btn.Text = "◻ " .. data.name
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+    btn.BorderSizePixel = 0
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.Parent = mainFrame
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 6)
+    btnCorner.Parent = btn
+    
+    buttons[data.name] = {
+        button = btn,
+        enabled = false,
+        color = data.color
+    }
+end
+
+-- Légende
+local legend = Instance.new("Frame")
+legend.Size = UDim2.new(0.9, 0, 0, 30)
+legend.Position = UDim2.new(0.05, 0, 0, 240)
+legend.BackgroundColor3 = Color3.fromRGB(30, 30, 55)
+legend.BackgroundTransparency = 0.3
+legend.BorderSizePixel = 0
+legend.Parent = mainFrame
+
+local legendCorner = Instance.new("UICorner")
+legendCorner.CornerRadius = UDim.new(0, 6)
+legendCorner.Parent = legend
+
+local legendText = Instance.new("TextLabel")
+legendText.Size = UDim2.new(1, 0, 1, 0)
+legendText.Text = "🔵 Sherif  🟢 Innocent  🔴 Murder  🟡 Hero"
+legendText.TextColor3 = Color3.fromRGB(200, 200, 200)
+legendText.BackgroundTransparency = 1
+legendText.Font = Enum.Font.Gotham
+legendText.TextSize = 11
+legendText.Parent = legend
+
+-- ===== OUVERTURE =====
+local function toggleMenu()
+    mainFrame.Visible = not mainFrame.Visible
+end
+
+logoBtn.MouseButton1Click:Connect(function()
+    if not isDragging then
+        toggleMenu()
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.F8 then
+        toggleMenu()
+    end
+end)
+
+-- ===== STOCKAGE =====
+_G.ESP.screenGui = screenGui
+_G.ESP.mainFrame = mainFrame
+_G.ESP.logoBtn = logoBtn
+_G.ESP.buttons = buttons
+
+print("   ✅ [MENU] Interface chargée !")
+return true
