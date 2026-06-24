@@ -1,6 +1,5 @@
 --[[
     🔥 ESP PLAYERS - Connecté aux switches du menu
-    À mettre dans le loadstring "Esp player"
 ]]
 
 print("   📦 [ESP_PLAYERS] Démarrage...")
@@ -134,16 +133,15 @@ end
 
 -- ============================================
 -- 🔹 CONNEXION AU SWITCH "ESP Players"
--- C'EST ICI QUE ÇA SE PASSE !
 -- ============================================
 local function connectToSwitch()
-    -- Récupère les switches depuis _G.ESP
-    local switches = _G.ESP and _G.ESP.switches and _G.ESP.switches.esp
+    -- Récupère les switches de la catégorie "ESP"
+    local switches = _G.ESP and _G.ESP.switches and _G.ESP.switches["ESP"]
     
     if not switches then
         print("   ⚠️ [ESP_PLAYERS] En attente du menu...")
         task.wait(0.5)
-        connectToSwitch() -- Réessaie plus tard
+        connectToSwitch()
         return
     end
     
