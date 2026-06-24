@@ -1,1 +1,68 @@
-main
+--[[
+    🔥 MAIN - Chargeur principal
+    Exécute ce script en premier
+]]
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+print("🚀 [MAIN] Démarrage du système...")
+
+-- Stockage global
+_G.ESP = {
+    modules = {},
+    buttons = {},
+    screenGui = nil,
+    mainFrame = nil,
+    logoBtn = nil,
+    loaded = {}
+}
+
+-- Fonction pour charger un module en toute sécurité
+local function loadModule(moduleUrl, moduleName)
+    print("   📦 Chargement de " .. moduleName .. "...")
+    local success, result = pcall(function()
+        return loadstring(game:HttpGet(moduleUrl))()
+    end)
+    
+    if success then
+        print("   ✅ " .. moduleName .. " chargé avec succès")
+        _G.ESP.loaded[moduleName] = true
+        return result
+    else
+        warn("   ❌ " .. moduleName .. " a échoué: " .. tostring(result))
+        _G.ESP.loaded[moduleName] = false
+        return nil
+    end
+end
+
+-- URLs des modules (à adapter si besoin)
+local BASE_URL = "https://raw.githubusercontent.com/7kv2-uhq/Mm2-by/refs/heads/main/"
+local modules = {
+    {name = "MENU", url = BASE_URL .. "Menu"},
+    {name = "ESP_PLAYERS", url = BASE_URL .. "Esp%20player"},
+    {name = "ESP_WEAPONS", url = BASE_URL .. "Esp%20weapon"},
+}
+
+-- Chargement en chaîne
+print("\n📌 [ÉTAPE 1] Chargement du Menu...")
+loadModule(modules[1].url, modules[1].name)
+task.wait(1)
+
+print("\n📌 [ÉTAPE 2] Chargement de ESP Players...")
+loadModule(modules[2].url, modules[2].name)
+task.wait(0.5)
+
+print("\n📌 [ÉTAPE 3] Chargement de ESP Weapons...")
+loadModule(modules[3].url, modules[3].name)
+task.wait(0.5)
+
+-- Résumé final
+print("\n" .. string.rep("=", 50))
+print("🎉 SYSTÈME COMPLET CHARGÉ !")
+print("📌 Clique sur ⚡ ou appuie sur F8")
+print("📌 Modules chargés:")
+for name, loaded in pairs(_G.ESP.loaded) do
+    print("   " .. (loaded and "✅" or "❌") .. " " .. name)
+end
+print(string.rep("=", 50))
