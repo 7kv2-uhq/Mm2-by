@@ -1,6 +1,5 @@
 --[[
-    🔥 MENU - Style Project Reverse
-    Avec catégories : Gameplay, ESP, Auto Farm, Coin Farm, etc.
+    🔥 MENU - Style Project Reverse (CORRIGÉ)
 ]]
 
 print("   📦 [MENU] Création de l'interface...")
@@ -246,7 +245,7 @@ local function createCategoryButton(name, icon, yPos)
 end
 
 -- ============================================
--- FONCTION POUR CRÉER UN SWITCH
+-- FONCTION POUR CRÉER UN SWITCH (CORRIGÉE)
 -- ============================================
 local function createSwitch(parent, yPos, labelText, descriptionText, defaultState)
     local isOn = defaultState or false
@@ -326,17 +325,22 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
         return isOn
     end
     
-    switchBg.MouseButton1Click:Connect(function()
-        local newState = toggleSwitch()
-        if switchContainer._onToggle then
-            switchContainer._onToggle(newState)
+    -- CORRECTION : Utiliser InputBegan au lieu de MouseButton1Click
+    switchBg.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local newState = toggleSwitch()
+            if switchContainer._onToggle then
+                switchContainer._onToggle(newState)
+            end
         end
     end)
     
-    cursor.MouseButton1Click:Connect(function()
-        local newState = toggleSwitch()
-        if switchContainer._onToggle then
-            switchContainer._onToggle(newState)
+    cursor.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local newState = toggleSwitch()
+            if switchContainer._onToggle then
+                switchContainer._onToggle(newState)
+            end
         end
     end)
     
@@ -520,17 +524,14 @@ end
 -- NAVIGATION ENTRE CATÉGORIES
 -- ============================================
 local function switchCategory(categoryName)
-    -- Cacher toutes les catégories
     for name, content in pairs(categoryContent) do
         content.Visible = false
     end
     
-    -- Désélectionner tous les boutons
     for name, btn in pairs(categoryButtons) do
         btn.BackgroundColor3 = Color3.fromRGB(25, 25, 50)
     end
     
-    -- Afficher la catégorie sélectionnée
     if categoryContent[categoryName] then
         categoryContent[categoryName].Visible = true
         categoryButtons[categoryName].BackgroundColor3 = Color3.fromRGB(45, 45, 80)
@@ -539,15 +540,13 @@ local function switchCategory(categoryName)
     end
 end
 
--- Connecter les boutons
 for name, btn in pairs(categoryButtons) do
     btn.MouseButton1Click:Connect(function()
         switchCategory(name)
     end)
 end
 
--- Sélectionner la première catégorie par défaut
-switchCategory("Gameplay")
+switchCategory("ESP")
 
 -- ============================================
 -- OUVERTURE / FERMETURE
@@ -589,7 +588,7 @@ _G.ESP.switches = {
 _G.ESP.categories = categoryContent
 _G.ESP.switchCategory = switchCategory
 
-print("   ✅ [MENU] Interface Project Reverse chargée !")
+print("   ✅ [MENU] Interface chargée !")
 print("   📌 " .. #categoryData .. " catégories disponibles")
 
 return true
