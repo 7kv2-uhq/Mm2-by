@@ -1,6 +1,5 @@
 --[[
-    🔥 ESP PLAYERS - ESP sur les joueurs avec couleurs MM2
-    À exécuter en troisième
+    🔥 ESP PLAYERS - Version avec détection améliorée
 ]]
 
 print("   📦 [ESP_PLAYERS] Démarrage...")
@@ -13,32 +12,63 @@ local espObjects = {}
 local enabled = false
 local screenGui = nil
 
--- ===== DÉTECTION DU RÔLE MM2 =====
+-- ===== DÉTECTION DU RÔLE (MULTI-MÉTHODES) =====
 local function getPlayerRole(targetPlayer)
-    -- Attributs
+    -- MÉTHODE 1 : Attributs
     local attrs = targetPlayer:GetAttributes()
     if attrs.Role then return attrs.Role end
     if attrs.Team then return attrs.Team end
     if attrs.MM2Role then return attrs.MM2Role end
+    if attrs.Sheriff then return "Sherif" end
+    if attrs.Murderer then return "Murder" end
+    if attrs.Hero then return "Hero" end
+    if attrs.Innocent then return "Innocent" end
     
-    -- StringValues
+    -- MÉTHODE 2 : StringValue / IntValue dans le joueur
     for _, child in pairs(targetPlayer:GetChildren()) do
         if child:IsA("StringValue") then
             local name = child.Name:lower()
-            if name:find("role") or name:find("team") then
-                return child.Value
+            local val = child.Value
+            if name:find("role") or name:find("team") or name:find("mm2") then
+                return val
+            end
+            -- Vérifie le contenu de la valeur
+            local v = val:lower()
+            if v:find("sherif") or v:find("sheriff") or v:find("detective") then
+                return "Sherif"
+            elseif v:find("murder") or v:find("killer") then
+                return "Murder"
+            elseif v:find("hero") then
+                return "Hero"
+            elseif v:find("innocent") or v:find("citizen") then
+                return "Innocent"
             end
         end
-        if child:IsA("IntValue") and child.Name:lower():find("team") then
+        if child:IsA("IntValue") then
+            local name = child.Name:lower()
             local val = child.Value
-            if val == 1 then return "Sherif" end
-            if val == 2 then return "Murder" end
-            if val == 3 then return "Innocent" end
-            if val == 4 then return "Hero" end
+            if name:find("role") or name:find("team") then
+                if val == 1 then return "Sherif" end
+                if val == 2 then return "Murder" end
+                if val == 3 then return "Innocent" end
+                if val == 4 then return "Hero" end
+            end
+            if name:find("sherif") and val == 1 then return "Sherif" end
+            if name:find("murder") and val == 1 then return "Murder" end
+            if name:find("hero") and val == 1 then return "Hero" end
+            if name:find("innocent") and val == 1 then return "Innocent" end
+        end
+        if child:IsA("BoolValue") then
+            local name = child.Name:lower()
+            local val = child.Value
+            if name:find("sherif") and val then return "Sherif" end
+            if name:find("murder") and val then return "Murder" end
+            if name:find("hero") and val then return "Hero" end
+            if name:find("innocent") and val then return "Innocent" end
         end
     end
     
-    -- Team
+    -- MÉTHODE 3 : Team
     if targetPlayer.Team then
         local teamName = targetPlayer.Team.Name:lower()
         if teamName:find("sherif") or teamName:find("sheriff") or teamName:find("detective") then
@@ -47,9 +77,57 @@ local function getPlayerRole(targetPlayer)
             return "Murder"
         elseif teamName:find("hero") then
             return "Hero"
+        elseif teamName:find("innocent") or teamName:find("citizen") then
+            return "Innocent"
         end
     end
     
+    -- MÉTHODE 4 : Dans le Character
+    if targetPlayer.Character then
+        for _, child in pairs(targetPlayer.Character:GetDescendants()) do
+            if child:IsA("StringValue") then
+                local name = child.Name:lower()
+                if name:find("role") or name:find("team") then
+                    return child.Value
+                end
+            end
+            if child:IsA("IntValue") then
+                local name = child.Name:lower()
+                local val = child.Value
+                if name:find("role") or name:find("team") then
+                    if val == 1 then return "Sherif" end
+                    if val == 2 then return "Murder" end
+                    if val == 3 then return "Innocent" end
+                    if val == 4 then return "Hero" end
+                end
+            end
+        end
+    end
+    
+    -- MÉTHODE 5 : Détection par les outils (MM2 style)
+    if targetPlayer.Character then
+        local hasKnife = false
+        local hasGun = false
+        for _, child in pairs(targetPlayer.Character:GetDescendants()) do
+            if child:IsA("Tool") then
+                local toolName = child.Name:lower()
+                if toolName:find("knife") or toolName:find("blade") or toolName:find("dagger") then
+                    hasKnife = true
+                end
+                if toolName:find("gun") or toolName:find("pistol") or toolName:find("shooter") then
+                    hasGun = true
+                end
+            end
+        end
+        if hasKnife and not hasGun then
+            return "Murder"
+        end
+        if hasGun then
+            return "Sherif"
+        end
+    end
+    
+    -- Par défaut
     return "Innocent"
 end
 
@@ -153,7 +231,7 @@ local function connectButton()
         buttons["ESP Players"].button.MouseButton1Click:Connect(function()
             local state = toggle()
             buttons["ESP Players"].button.Text = (state and "☑ " or "◻ ") .. "ESP Players"
-            buttons["ESP Players"].button.BackgroundColor3 = state and buttons["ESP Players"].color or Color3.fromRGB(40, 40, 60)
+            buttons["ESP Players"].button.BackgroundColor3 = state and buttons["ESP Players"].color or Color3.fromRGB(50, 50, 75)
             print("📌 ESP Players = " .. tostring(state))
         end)
         print("   ✅ [ESP_PLAYERS] Connecté au bouton")
@@ -164,5 +242,5 @@ local function connectButton()
 end
 connectButton()
 
-print("   ✅ [ESP_PLAYERS] Prêt !")
+print("   ✅ [ESP_PLAYERS] Prêt ! (Détection multi-méthodes)")
 return true
