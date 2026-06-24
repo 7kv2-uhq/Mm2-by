@@ -1,1 +1,156 @@
-esp weapon
+--[[
+    🔥 ESP WEAPONS - ESP sur les armes au sol (drop)
+    À exécuter en quatrième
+]]
+
+print("   📦 [ESP_WEAPONS] Démarrage...")
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+local espObjects = {}
+local enabled = false
+local screenGui = nil
+local scanTimer = 0
+
+-- ===== DÉTECTION DES ARMES AU SOL =====
+local function isDroppedWeapon(part)
+    if not part or not part:IsA("BasePart") then return false end
+    if not part.Parent then return false end
+    
+    local name = part.Name:lower()
+    local parent = part.Parent
+    local parentName = parent.Name:lower()
+    
+    -- Exclure les armes tenues par les joueurs
+    local currentParent = part
+    while currentParent do
+        if currentParent:IsA("Model") and currentParent:FindFirstChild("Humanoid") then
+            return false
+        end
+        currentParent = currentParent.Parent
+    end
+    
+    -- Vérifier si c'est un Tool
+    if part:IsA("Tool") then return true end
+    if parent:IsA("Tool") then
+        local toolParent = parent.Parent
+        if toolParent and toolParent:IsA("Model") and toolParent:FindFirstChild("Humanoid") then
+            return false
+        end
+        return true
+    end
+    
+    -- Mots-clés pour les armes
+    local keywords = {
+        "gun", "pistol", "weapon", "knife", "sword", "blade",
+        "shotgun", "rifle", "sniper", "revolver", "smg",
+        "axe", "hammer", "bat", "dagger", "katana", "handle"
+    }
+    
+    for _, kw in pairs(keywords) do
+        if name:find(kw) or parentName:find(kw) then
+            return true
+        end
+    end
+    
+    return false
+end
+
+-- ===== SCAN DES ARMES =====
+local function scan()
+    if not enabled then return end
+    
+    if not screenGui then
+        screenGui = player.PlayerGui:FindFirstChild("ESPPanel")
+        if not screenGui then return end
+    end
+    
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("BasePart") and isDroppedWeapon(part) then
+            local exists = false
+            for _, obj in pairs(espObjects) do
+                if obj:IsA("Highlight") and obj.Adornee == part then
+                    exists = true
+                    break
+                end
+            end
+            
+            if not exists and part.Parent then
+                local h = Instance.new("Highlight")
+                h.Adornee = part
+                h.FillColor = Color3.fromRGB(255, 215, 0)  -- Doré
+                h.FillTransparency = 0.2
+                h.OutlineColor = Color3.fromRGB(255, 255, 255)
+                h.OutlineTransparency = 0.1
+                h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                h.Parent = screenGui
+                table.insert(espObjects, h)
+            end
+        end
+    end
+    
+    -- Nettoyage
+    for i = #espObjects, 1, -1 do
+        local obj = espObjects[i]
+        if obj:IsA("Highlight") then
+            if not obj.Adornee or not obj.Adornee.Parent then
+                obj:Destroy()
+                table.remove(espObjects, i)
+            end
+        end
+    end
+end
+
+-- ===== FONCTIONS PUBLIQUES =====
+local function toggle()
+    enabled = not enabled
+    if not enabled then
+        for _, obj in pairs(espObjects) do
+            pcall(function() obj:Destroy() end)
+        end
+        espObjects = {}
+    end
+    return enabled
+end
+
+local function isEnabled()
+    return enabled
+end
+
+-- ===== BOUCLE (scan toutes les 2 secondes) =====
+RunService.RenderStepped:Connect(function(dt)
+    scanTimer = scanTimer + dt
+    if scanTimer >= 2 then
+        scanTimer = 0
+        scan()
+    end
+end)
+
+-- ===== STOCKAGE =====
+_G.ESP.modules.ESPWeapons = {
+    toggle = toggle,
+    isEnabled = isEnabled
+}
+
+-- ===== CONNEXION AU BOUTON =====
+local function connectButton()
+    local buttons = _G.ESP and _G.ESP.buttons
+    if buttons and buttons["ESP Weapons"] then
+        buttons["ESP Weapons"].button.MouseButton1Click:Connect(function()
+            local state = toggle()
+            buttons["ESP Weapons"].button.Text = (state and "☑ " or "◻ ") .. "ESP Weapons"
+            buttons["ESP Weapons"].button.BackgroundColor3 = state and buttons["ESP Weapons"].color or Color3.fromRGB(40, 40, 60)
+            print("📌 ESP Weapons = " .. tostring(state))
+        end)
+        print("   ✅ [ESP_WEAPONS] Connecté au bouton")
+    else
+        task.wait(0.5)
+        connectButton()
+    end
+end
+connectButton()
+
+print("   ✅ [ESP_WEAPONS] Prêt !")
+return true
