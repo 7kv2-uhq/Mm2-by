@@ -1,12 +1,11 @@
 --[[
-    🔥 MENU - Interface moderne avec switches
+    🔥 MENU - Version stable (sans TweenService)
 ]]
 
 print("   📦 [MENU] Création de l'interface...")
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 
 -- ============================================
@@ -18,17 +17,19 @@ screenGui.Parent = player:WaitForChild("PlayerGui")
 screenGui.ResetOnSpawn = false
 
 -- ============================================
--- LOGO BOUTON
+-- LOGO BOUTON (TextButton au lieu de ImageButton)
 -- ============================================
-local logoBtn = Instance.new("ImageButton")
+local logoBtn = Instance.new("TextButton")
 logoBtn.Size = UDim2.new(0, 48, 0, 48)
 logoBtn.Position = UDim2.new(1, -62, 0, 18)
+logoBtn.Text = "⚡"
+logoBtn.TextColor3 = Color3.fromRGB(255, 200, 50)
+logoBtn.TextSize = 28
 logoBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 55)
 logoBtn.BackgroundTransparency = 0
 logoBtn.BorderSizePixel = 2
 logoBtn.BorderColor3 = Color3.fromRGB(80, 80, 140)
-logoBtn.Image = "rbxassetid://6031091313" -- icône éclair
-logoBtn.ImageColor3 = Color3.fromRGB(255, 200, 50)
+logoBtn.Font = Enum.Font.GothamBold
 logoBtn.Parent = screenGui
 logoBtn.ZIndex = 999
 
@@ -36,29 +37,12 @@ local logoCorner = Instance.new("UICorner")
 logoCorner.CornerRadius = UDim.new(1, 0)
 logoCorner.Parent = logoBtn
 
--- Glow
-local logoGlow = Instance.new("Frame")
-logoGlow.Size = UDim2.new(1.6, 0, 1.6, 0)
-logoGlow.Position = UDim2.new(-0.3, 0, -0.3, 0)
-logoGlow.BackgroundColor3 = Color3.fromRGB(255, 200, 50)
-logoGlow.BackgroundTransparency = 0.9
-logoGlow.BorderSizePixel = 0
-logoGlow.Parent = logoBtn
-
-local glowCorner = Instance.new("UICorner")
-glowCorner.CornerRadius = UDim.new(1, 0)
-glowCorner.Parent = logoGlow
-
-TweenService:Create(logoGlow, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
-    BackgroundTransparency = 0.8
-}):Play()
-
 -- Hover
 logoBtn.MouseEnter:Connect(function()
-    TweenService:Create(logoBtn, TweenInfo.new(0.15), {Size = UDim2.new(0, 52, 0, 52)}):Play()
+    logoBtn.Size = UDim2.new(0, 52, 0, 52)
 end)
 logoBtn.MouseLeave:Connect(function()
-    TweenService:Create(logoBtn, TweenInfo.new(0.15), {Size = UDim2.new(0, 48, 0, 48)}):Play()
+    logoBtn.Size = UDim2.new(0, 48, 0, 48)
 end)
 
 -- ============================================
@@ -111,20 +95,6 @@ mainFrame.ZIndex = 998
 local mainCorner = Instance.new("UICorner")
 mainCorner.CornerRadius = UDim.new(0, 14)
 mainCorner.Parent = mainFrame
-
--- Ombre
-local shadow = Instance.new("Frame")
-shadow.Size = UDim2.new(1, 10, 1, 10)
-shadow.Position = UDim2.new(0, -5, 0, -5)
-shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-shadow.BackgroundTransparency = 0.6
-shadow.BorderSizePixel = 0
-shadow.ZIndex = -1
-shadow.Parent = mainFrame
-
-local shadowCorner = Instance.new("UICorner")
-shadowCorner.CornerRadius = UDim.new(0, 16)
-shadowCorner.Parent = shadow
 
 -- ============================================
 -- BANDEAU HAUT
@@ -196,18 +166,6 @@ sidebar.BackgroundTransparency = 0
 sidebar.BorderSizePixel = 0
 sidebar.Parent = mainFrame
 
-local sidebarCorner = Instance.new("UICorner")
-sidebarCorner.CornerRadius = UDim.new(0, 0)
-sidebarCorner.Parent = sidebar
-
--- Ligne séparatrice
-local separatorLine = Instance.new("Frame")
-separatorLine.Size = UDim2.new(0, 1, 1, -12)
-separatorLine.Position = UDim2.new(1, 0, 0, 6)
-separatorLine.BackgroundColor3 = Color3.fromRGB(60, 60, 100)
-separatorLine.BorderSizePixel = 0
-separatorLine.Parent = sidebar
-
 -- ===== BOUTON VISUAL =====
 local visualNav = Instance.new("TextButton")
 visualNav.Size = UDim2.new(0, 40, 0, 40)
@@ -224,30 +182,6 @@ visualNav.ZIndex = 999
 local visualCorner = Instance.new("UICorner")
 visualCorner.CornerRadius = UDim.new(0, 10)
 visualCorner.Parent = visualNav
-
--- Tooltip
-local visualTip = Instance.new("TextLabel")
-visualTip.Size = UDim2.new(0, 70, 0, 24)
-visualTip.Position = UDim2.new(0, 48, 0, 14)
-visualTip.Text = "Visuals"
-visualTip.TextColor3 = Color3.fromRGB(255, 255, 255)
-visualTip.BackgroundColor3 = Color3.fromRGB(18, 18, 35)
-visualTip.BorderSizePixel = 0
-visualTip.Font = Enum.Font.Gotham
-visualTip.TextSize = 12
-visualTip.Visible = false
-visualTip.Parent = sidebar
-
-local visualTipCorner = Instance.new("UICorner")
-visualTipCorner.CornerRadius = UDim.new(0, 6)
-visualTipCorner.Parent = visualTip
-
-visualNav.MouseEnter:Connect(function()
-    visualTip.Visible = true
-end)
-visualNav.MouseLeave:Connect(function()
-    visualTip.Visible = false
-end)
 
 -- ===== BOUTON COMBAT =====
 local combatNav = Instance.new("TextButton")
@@ -266,29 +200,6 @@ local combatCorner = Instance.new("UICorner")
 combatCorner.CornerRadius = UDim.new(0, 10)
 combatCorner.Parent = combatNav
 
-local combatTip = Instance.new("TextLabel")
-combatTip.Size = UDim2.new(0, 70, 0, 24)
-combatTip.Position = UDim2.new(0, 48, 0, 68)
-combatTip.Text = "Combat"
-combatTip.TextColor3 = Color3.fromRGB(255, 255, 255)
-combatTip.BackgroundColor3 = Color3.fromRGB(18, 18, 35)
-combatTip.BorderSizePixel = 0
-combatTip.Font = Enum.Font.Gotham
-combatTip.TextSize = 12
-combatTip.Visible = false
-combatTip.Parent = sidebar
-
-local combatTipCorner = Instance.new("UICorner")
-combatTipCorner.CornerRadius = UDim.new(0, 6)
-combatTipCorner.Parent = combatTip
-
-combatNav.MouseEnter:Connect(function()
-    combatTip.Visible = true
-end)
-combatNav.MouseLeave:Connect(function()
-    combatTip.Visible = false
-end)
-
 -- ============================================
 -- CONTENEUR DES SECTIONS
 -- ============================================
@@ -301,12 +212,11 @@ container.BorderSizePixel = 0
 container.Parent = mainFrame
 
 -- ============================================
--- FONCTION POUR CRÉER UN SWITCH
+-- FONCTION POUR CRÉER UN SWITCH (sans TweenService)
 -- ============================================
 local function createSwitch(parent, yPos, labelText, descriptionText, defaultState)
     local isOn = defaultState or false
     
-    -- Conteneur du switch
     local switchContainer = Instance.new("Frame")
     switchContainer.Size = UDim2.new(1, -8, 0, 44)
     switchContainer.Position = UDim2.new(0, 4, 0, yPos)
@@ -369,16 +279,15 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
     cursorCorner.CornerRadius = UDim.new(1, 0)
     cursorCorner.Parent = cursor
     
-    -- Animation de switch
+    -- Fonction toggle (sans TweenService)
     local function toggleSwitch()
         isOn = not isOn
-        local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         if isOn then
-            TweenService:Create(switchBg, tweenInfo, {BackgroundColor3 = Color3.fromRGB(60, 60, 180)}):Play()
-            TweenService:Create(cursor, tweenInfo, {Position = UDim2.new(1, -22, 0.5, -10)}):Play()
+            switchBg.BackgroundColor3 = Color3.fromRGB(60, 60, 180)
+            cursor.Position = UDim2.new(1, -22, 0.5, -10)
         else
-            TweenService:Create(switchBg, tweenInfo, {BackgroundColor3 = Color3.fromRGB(60, 60, 80)}):Play()
-            TweenService:Create(cursor, tweenInfo, {Position = UDim2.new(0, 2, 0.5, -10)}):Play()
+            switchBg.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+            cursor.Position = UDim2.new(0, 2, 0.5, -10)
         end
         return isOn
     end
@@ -399,7 +308,7 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
         end
     end)
     
-    -- Fonction pour définir l'état
+    -- Fonctions publiques
     function switchContainer:setState(state)
         if state ~= isOn then
             toggleSwitch()
@@ -418,7 +327,7 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
 end
 
 -- ============================================
--- SECTION VISUAL (ESP)
+-- SECTION VISUAL
 -- ============================================
 local visualSection = Instance.new("Frame")
 visualSection.Size = UDim2.new(1, 0, 1, 0)
@@ -426,7 +335,6 @@ visualSection.BackgroundTransparency = 1
 visualSection.Parent = container
 visualSection.Visible = true
 
--- Titre de section
 local visualSectionTitle = Instance.new("TextLabel")
 visualSectionTitle.Size = UDim2.new(1, 0, 0, 28)
 visualSectionTitle.Position = UDim2.new(0, 0, 0, 0)
@@ -438,7 +346,6 @@ visualSectionTitle.TextSize = 14
 visualSectionTitle.TextXAlignment = Enum.TextXAlignment.Center
 visualSectionTitle.Parent = visualSection
 
--- Switches Visuals
 local visualSwitches = {}
 
 local switchData = {
@@ -466,16 +373,7 @@ local legendCorner = Instance.new("UICorner")
 legendCorner.CornerRadius = UDim.new(0, 8)
 legendCorner.Parent = legendBox
 
-local legendText = Instance.new("TextLabel")
-legendText.Size = UDim2.new(1, 0, 1, 0)
-legendText.Text = "● Sheriff  ● Innocent  ● Murder  ● Hero"
-legendText.TextColor3 = Color3.fromRGB(180, 180, 220)
-legendText.BackgroundTransparency = 1
-legendText.Font = Enum.Font.Gotham
-legendText.TextSize = 12
-legendText.Parent = legendBox
-
--- Couleurs de la légende (utilise des TextLabel séparés)
+-- Couleurs de la légende
 local colors = {
     {text = "Sheriff", color = Color3.fromRGB(0, 100, 255)},
     {text = "Innocent", color = Color3.fromRGB(0, 255, 0)},
@@ -483,11 +381,11 @@ local colors = {
     {text = "Hero", color = Color3.fromRGB(255, 215, 0)},
 }
 
-local xPos = 0
+local xPos = 8
 for _, c in ipairs(colors) do
     local dot = Instance.new("TextLabel")
-    dot.Size = UDim2.new(0, 60, 0, 14)
-    dot.Position = UDim2.new(0, 8 + xPos, 0, 26)
+    dot.Size = UDim2.new(0, 60, 0, 16)
+    dot.Position = UDim2.new(0, xPos, 0, 22)
     dot.Text = "● " .. c.text
     dot.TextColor3 = c.color
     dot.BackgroundTransparency = 1
@@ -590,4 +488,36 @@ end)
 -- OUVERTURE / FERMETURE
 -- ============================================
 local function toggleMenu()
-    mainFrame.Visib
+    mainFrame.Visible = not mainFrame.Visible
+    print("📌 Menu visible:", mainFrame.Visible)
+end
+
+logoBtn.MouseButton1Click:Connect(function()
+    if not isDragging then
+        toggleMenu()
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.F8 then
+        toggleMenu()
+    end
+end)
+
+-- ============================================
+-- STOCKAGE
+-- ============================================
+_G.ESP.screenGui = screenGui
+_G.ESP.mainFrame = mainFrame
+_G.ESP.logoBtn = logoBtn
+_G.ESP.switches = {
+    visual = visualSwitches,
+    combat = combatSwitches
+}
+_G.ESP.buttons = {}
+_G.ESP.switchSection = switchSection
+
+print("   ✅ [MENU] Interface chargée !")
+print("   📌 Switches: OK | Navigation: OK")
+
+return true
