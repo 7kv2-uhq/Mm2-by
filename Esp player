@@ -1,5 +1,6 @@
 --[[
-    🔥 ESP PLAYERS - Version avec détection améliorée
+    🔥 ESP PLAYERS - SOLUTION ULTIME
+    Détection par outils + mémorisation
 ]]
 
 print("   📦 [ESP_PLAYERS] Démarrage...")
@@ -12,140 +13,117 @@ local espObjects = {}
 local enabled = false
 local screenGui = nil
 
--- ===== DÉTECTION DU RÔLE (MULTI-MÉTHODES) =====
+-- MÉMOIRE DES RÔLES (persistant)
+local roleMemory = {}
+
+-- COULEURS
+local COLORS = {
+    Murder = Color3.fromRGB(255, 0, 0),    -- Rouge
+    Sherif = Color3.fromRGB(0, 100, 255),  -- Bleu
+    Hero = Color3.fromRGB(255, 215, 0),    -- Jaune
+    Innocent = Color3.fromRGB(0, 255, 0),  -- Vert
+}
+
+-- ===== DÉTECTION DU RÔLE PAR LES OUTILS =====
+local function detectRoleByTools(character)
+    if not character then return nil end
+    
+    local hasKnife = false
+    local hasGun = false
+    
+    for _, child in pairs(character:GetDescendants()) do
+        if child:IsA("Tool") then
+            local name = child.Name:lower()
+            if name:find("knife") or name:find("blade") or name:find("dagger") or name:find("couteau") then
+                hasKnife = true
+            end
+            if name:find("gun") or name:find("pistol") or name:find("shooter") or name:find("pistolet") then
+                hasGun = true
+            end
+        end
+    end
+    
+    if hasKnife and not hasGun then
+        return "Murder"
+    end
+    if hasGun then
+        return "Sherif"
+    end
+    return nil
+end
+
+-- ===== OBTENIR LE RÔLE (avec mémorisation) =====
 local function getPlayerRole(targetPlayer)
-    -- MÉTHODE 1 : Attributs
-    local attrs = targetPlayer:GetAttributes()
-    if attrs.Role then return attrs.Role end
-    if attrs.Team then return attrs.Team end
-    if attrs.MM2Role then return attrs.MM2Role end
-    if attrs.Sheriff then return "Sherif" end
-    if attrs.Murderer then return "Murder" end
-    if attrs.Hero then return "Hero" end
-    if attrs.Innocent then return "Innocent" end
+    local name = targetPlayer.Name
     
-    -- MÉTHODE 2 : StringValue / IntValue dans le joueur
-    for _, child in pairs(targetPlayer:GetChildren()) do
-        if child:IsA("StringValue") then
-            local name = child.Name:lower()
-            local val = child.Value
-            if name:find("role") or name:find("team") or name:find("mm2") then
-                return val
-            end
-            -- Vérifie le contenu de la valeur
-            local v = val:lower()
-            if v:find("sherif") or v:find("sheriff") or v:find("detective") then
-                return "Sherif"
-            elseif v:find("murder") or v:find("killer") then
-                return "Murder"
-            elseif v:find("hero") then
-                return "Hero"
-            elseif v:find("innocent") or v:find("citizen") then
-                return "Innocent"
-            end
-        end
-        if child:IsA("IntValue") then
-            local name = child.Name:lower()
-            local val = child.Value
-            if name:find("role") or name:find("team") then
-                if val == 1 then return "Sherif" end
-                if val == 2 then return "Murder" end
-                if val == 3 then return "Innocent" end
-                if val == 4 then return "Hero" end
-            end
-            if name:find("sherif") and val == 1 then return "Sherif" end
-            if name:find("murder") and val == 1 then return "Murder" end
-            if name:find("hero") and val == 1 then return "Hero" end
-            if name:find("innocent") and val == 1 then return "Innocent" end
-        end
-        if child:IsA("BoolValue") then
-            local name = child.Name:lower()
-            local val = child.Value
-            if name:find("sherif") and val then return "Sherif" end
-            if name:find("murder") and val then return "Murder" end
-            if name:find("hero") and val then return "Hero" end
-            if name:find("innocent") and val then return "Innocent" end
-        end
+    -- 1. Si déjà en mémoire, on renvoie
+    if roleMemory[name] then
+        return roleMemory[name]
     end
     
-    -- MÉTHODE 3 : Team
-    if targetPlayer.Team then
-        local teamName = targetPlayer.Team.Name:lower()
-        if teamName:find("sherif") or teamName:find("sheriff") or teamName:find("detective") then
-            return "Sherif"
-        elseif teamName:find("murder") or teamName:find("killer") then
-            return "Murder"
-        elseif teamName:find("hero") then
-            return "Hero"
-        elseif teamName:find("innocent") or teamName:find("citizen") then
-            return "Innocent"
-        end
-    end
-    
-    -- MÉTHODE 4 : Dans le Character
+    -- 2. Détection par les outils
     if targetPlayer.Character then
-        for _, child in pairs(targetPlayer.Character:GetDescendants()) do
-            if child:IsA("StringValue") then
-                local name = child.Name:lower()
-                if name:find("role") or name:find("team") then
-                    return child.Value
-                end
-            end
-            if child:IsA("IntValue") then
-                local name = child.Name:lower()
-                local val = child.Value
-                if name:find("role") or name:find("team") then
-                    if val == 1 then return "Sherif" end
-                    if val == 2 then return "Murder" end
-                    if val == 3 then return "Innocent" end
-                    if val == 4 then return "Hero" end
-                end
-            end
+        local role = detectRoleByTools(targetPlayer.Character)
+        if role then
+            roleMemory[name] = role
+            print("   ✅ " .. name .. " → " .. role .. " (détecté par outil)")
+            return role
         end
     end
     
-    -- MÉTHODE 5 : Détection par les outils (MM2 style)
-    if targetPlayer.Character then
-        local hasKnife = false
-        local hasGun = false
-        for _, child in pairs(targetPlayer.Character:GetDescendants()) do
-            if child:IsA("Tool") then
-                local toolName = child.Name:lower()
-                if toolName:find("knife") or toolName:find("blade") or toolName:find("dagger") then
-                    hasKnife = true
-                end
-                if toolName:find("gun") or toolName:find("pistol") or toolName:find("shooter") then
-                    hasGun = true
-                end
-            end
-        end
-        if hasKnife and not hasGun then
-            return "Murder"
-        end
-        if hasGun then
-            return "Sherif"
-        end
-    end
-    
-    -- Par défaut
+    -- 3. Par défaut : Innocent (mais on vérifie les autres joueurs)
+    -- Si c'est un joueur sans arme, on le met Innocent
+    roleMemory[name] = "Innocent"
+    print("   👤 " .. name .. " → Innocent (par défaut)")
     return "Innocent"
 end
 
-local function getRoleColor(role)
-    local r = role:lower()
-    if r:find("sherif") or r:find("sheriff") or r:find("detective") then
-        return Color3.fromRGB(0, 100, 255)  -- Bleu
-    elseif r:find("murder") or r:find("killer") then
-        return Color3.fromRGB(255, 0, 0)    -- Rouge
-    elseif r:find("hero") then
-        return Color3.fromRGB(255, 215, 0)  -- Jaune
-    else
-        return Color3.fromRGB(0, 255, 0)    -- Vert (Innocent)
+-- ===== FORCER LA MISE À JOUR DES RÔLES =====
+local function updateAllRoles()
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= player and p.Character then
+            local role = detectRoleByTools(p.Character)
+            if role then
+                roleMemory[p.Name] = role
+            end
+        end
     end
 end
 
+-- ===== QUAND UN JOUEUR CHANGE D'OUTIL =====
+local function onToolAdded(player, tool)
+    task.wait(0.5) -- Attendre que l'outil soit bien équipé
+    local role = detectRoleByTools(player.Character)
+    if role then
+        roleMemory[player.Name] = role
+        print("   🔄 " .. player.Name .. " → " .. role .. " (outil équipé)")
+    end
+end
+
+-- Détecter les changements d'outils
+for _, p in pairs(Players:GetPlayers()) do
+    if p.Character then
+        p.Character.ChildAdded:Connect(function(child)
+            if child:IsA("Tool") then
+                onToolAdded(p, child)
+            end
+        end)
+    end
+end
+
+Players.PlayerAdded:Connect(function(p)
+    p.CharacterAdded:Connect(function(char)
+        char.ChildAdded:Connect(function(child)
+            if child:IsA("Tool") then
+                task.wait(0.5)
+                onToolAdded(p, child)
+            end
+        end)
+    end)
+end)
+
 -- ===== MISE À JOUR ESP =====
-local function update()
+local function updateESP()
     if not enabled then
         for _, obj in pairs(espObjects) do
             pcall(function() obj:Destroy() end)
@@ -159,10 +137,13 @@ local function update()
         if not screenGui then return end
     end
     
+    -- Met à jour les rôles périodiquement
+    updateAllRoles()
+    
     for _, p in pairs(Players:GetPlayers()) do
         if p ~= player and p.Character and p.Character:FindFirstChild("Humanoid") then
             local role = getPlayerRole(p)
-            local color = getRoleColor(role)
+            local color = COLORS[role] or COLORS.Innocent
             
             local hasESP = false
             for _, obj in pairs(espObjects) do
@@ -216,7 +197,11 @@ local function isEnabled()
 end
 
 -- ===== BOUCLE =====
-RunService.RenderStepped:Connect(update)
+RunService.RenderStepped:Connect(updateESP)
+
+-- Met à jour les rôles au démarrage
+task.wait(1)
+updateAllRoles()
 
 -- ===== STOCKAGE =====
 _G.ESP.modules.ESPPlayers = {
@@ -242,5 +227,6 @@ local function connectButton()
 end
 connectButton()
 
-print("   ✅ [ESP_PLAYERS] Prêt ! (Détection multi-méthodes)")
+print("   ✅ [ESP_PLAYERS] Prêt !")
+print("   📌 Détection par outils + mémorisation")
 return true
