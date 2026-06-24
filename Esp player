@@ -1,1 +1,168 @@
-esp play
+--[[
+    🔥 ESP PLAYERS - ESP sur les joueurs avec couleurs MM2
+    À exécuter en troisième
+]]
+
+print("   📦 [ESP_PLAYERS] Démarrage...")
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+local espObjects = {}
+local enabled = false
+local screenGui = nil
+
+-- ===== DÉTECTION DU RÔLE MM2 =====
+local function getPlayerRole(targetPlayer)
+    -- Attributs
+    local attrs = targetPlayer:GetAttributes()
+    if attrs.Role then return attrs.Role end
+    if attrs.Team then return attrs.Team end
+    if attrs.MM2Role then return attrs.MM2Role end
+    
+    -- StringValues
+    for _, child in pairs(targetPlayer:GetChildren()) do
+        if child:IsA("StringValue") then
+            local name = child.Name:lower()
+            if name:find("role") or name:find("team") then
+                return child.Value
+            end
+        end
+        if child:IsA("IntValue") and child.Name:lower():find("team") then
+            local val = child.Value
+            if val == 1 then return "Sherif" end
+            if val == 2 then return "Murder" end
+            if val == 3 then return "Innocent" end
+            if val == 4 then return "Hero" end
+        end
+    end
+    
+    -- Team
+    if targetPlayer.Team then
+        local teamName = targetPlayer.Team.Name:lower()
+        if teamName:find("sherif") or teamName:find("sheriff") or teamName:find("detective") then
+            return "Sherif"
+        elseif teamName:find("murder") or teamName:find("killer") then
+            return "Murder"
+        elseif teamName:find("hero") then
+            return "Hero"
+        end
+    end
+    
+    return "Innocent"
+end
+
+local function getRoleColor(role)
+    local r = role:lower()
+    if r:find("sherif") or r:find("sheriff") or r:find("detective") then
+        return Color3.fromRGB(0, 100, 255)  -- Bleu
+    elseif r:find("murder") or r:find("killer") then
+        return Color3.fromRGB(255, 0, 0)    -- Rouge
+    elseif r:find("hero") then
+        return Color3.fromRGB(255, 215, 0)  -- Jaune
+    else
+        return Color3.fromRGB(0, 255, 0)    -- Vert (Innocent)
+    end
+end
+
+-- ===== MISE À JOUR ESP =====
+local function update()
+    if not enabled then
+        for _, obj in pairs(espObjects) do
+            pcall(function() obj:Destroy() end)
+        end
+        espObjects = {}
+        return
+    end
+    
+    if not screenGui then
+        screenGui = player.PlayerGui:FindFirstChild("ESPPanel")
+        if not screenGui then return end
+    end
+    
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= player and p.Character and p.Character:FindFirstChild("Humanoid") then
+            local role = getPlayerRole(p)
+            local color = getRoleColor(role)
+            
+            local hasESP = false
+            for _, obj in pairs(espObjects) do
+                if obj:IsA("Highlight") and obj.Adornee == p.Character then
+                    hasESP = true
+                    obj.FillColor = color
+                    break
+                end
+            end
+            
+            if not hasESP then
+                local h = Instance.new("Highlight")
+                h.Adornee = p.Character
+                h.FillColor = color
+                h.FillTransparency = 0.35
+                h.OutlineColor = Color3.fromRGB(255, 255, 255)
+                h.OutlineTransparency = 0.1
+                h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                h.Parent = screenGui
+                table.insert(espObjects, h)
+            end
+        end
+    end
+    
+    -- Nettoyage
+    for i = #espObjects, 1, -1 do
+        local obj = espObjects[i]
+        if obj:IsA("Highlight") then
+            if not obj.Adornee or not obj.Adornee:FindFirstChild("Humanoid") then
+                obj:Destroy()
+                table.remove(espObjects, i)
+            end
+        end
+    end
+end
+
+-- ===== FONCTIONS PUBLIQUES =====
+local function toggle()
+    enabled = not enabled
+    if not enabled then
+        for _, obj in pairs(espObjects) do
+            pcall(function() obj:Destroy() end)
+        end
+        espObjects = {}
+    end
+    return enabled
+end
+
+local function isEnabled()
+    return enabled
+end
+
+-- ===== BOUCLE =====
+RunService.RenderStepped:Connect(update)
+
+-- ===== STOCKAGE =====
+_G.ESP.modules.ESPPlayers = {
+    toggle = toggle,
+    isEnabled = isEnabled
+}
+
+-- ===== CONNEXION AU BOUTON =====
+local function connectButton()
+    local buttons = _G.ESP and _G.ESP.buttons
+    if buttons and buttons["ESP Players"] then
+        buttons["ESP Players"].button.MouseButton1Click:Connect(function()
+            local state = toggle()
+            buttons["ESP Players"].button.Text = (state and "☑ " or "◻ ") .. "ESP Players"
+            buttons["ESP Players"].button.BackgroundColor3 = state and buttons["ESP Players"].color or Color3.fromRGB(40, 40, 60)
+            print("📌 ESP Players = " .. tostring(state))
+        end)
+        print("   ✅ [ESP_PLAYERS] Connecté au bouton")
+    else
+        task.wait(0.5)
+        connectButton()
+    end
+end
+connectButton()
+
+print("   ✅ [ESP_PLAYERS] Prêt !")
+return true
