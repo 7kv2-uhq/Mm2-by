@@ -1,14 +1,17 @@
 --[[
-    🔥 MENU - Interface avec sections (ESP + Combat)
+    🔥 MENU - Interface moderne avec switches
 ]]
 
 print("   📦 [MENU] Création de l'interface...")
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 
--- ScreenGui
+-- ============================================
+-- SCREENGUI
+-- ============================================
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "ESPPanel"
 screenGui.Parent = player:WaitForChild("PlayerGui")
@@ -17,32 +20,49 @@ screenGui.ResetOnSpawn = false
 -- ============================================
 -- LOGO BOUTON
 -- ============================================
-local logoBtn = Instance.new("TextButton")
-logoBtn.Size = UDim2.new(0, 55, 0, 55)
-logoBtn.Position = UDim2.new(1, -70, 0, 15)
-logoBtn.Text = "⚡"
-logoBtn.TextColor3 = Color3.fromRGB(255, 220, 50)
-logoBtn.TextSize = 32
-logoBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+local logoBtn = Instance.new("ImageButton")
+logoBtn.Size = UDim2.new(0, 48, 0, 48)
+logoBtn.Position = UDim2.new(1, -62, 0, 18)
+logoBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 55)
 logoBtn.BackgroundTransparency = 0
-logoBtn.BorderSizePixel = 0
-logoBtn.Font = Enum.Font.GothamBold
+logoBtn.BorderSizePixel = 2
+logoBtn.BorderColor3 = Color3.fromRGB(80, 80, 140)
+logoBtn.Image = "rbxassetid://6031091313" -- icône éclair
+logoBtn.ImageColor3 = Color3.fromRGB(255, 200, 50)
 logoBtn.Parent = screenGui
 logoBtn.ZIndex = 999
 
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(1, 0)
-corner.Parent = logoBtn
+local logoCorner = Instance.new("UICorner")
+logoCorner.CornerRadius = UDim.new(1, 0)
+logoCorner.Parent = logoBtn
 
+-- Glow
+local logoGlow = Instance.new("Frame")
+logoGlow.Size = UDim2.new(1.6, 0, 1.6, 0)
+logoGlow.Position = UDim2.new(-0.3, 0, -0.3, 0)
+logoGlow.BackgroundColor3 = Color3.fromRGB(255, 200, 50)
+logoGlow.BackgroundTransparency = 0.9
+logoGlow.BorderSizePixel = 0
+logoGlow.Parent = logoBtn
+
+local glowCorner = Instance.new("UICorner")
+glowCorner.CornerRadius = UDim.new(1, 0)
+glowCorner.Parent = logoGlow
+
+TweenService:Create(logoGlow, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
+    BackgroundTransparency = 0.8
+}):Play()
+
+-- Hover
 logoBtn.MouseEnter:Connect(function()
-    logoBtn.Size = UDim2.new(0, 60, 0, 60)
+    TweenService:Create(logoBtn, TweenInfo.new(0.15), {Size = UDim2.new(0, 52, 0, 52)}):Play()
 end)
 logoBtn.MouseLeave:Connect(function()
-    logoBtn.Size = UDim2.new(0, 55, 0, 55)
+    TweenService:Create(logoBtn, TweenInfo.new(0.15), {Size = UDim2.new(0, 48, 0, 48)}):Play()
 end)
 
 -- ============================================
--- DRAG POUR LOGO
+-- DRAG LOGO
 -- ============================================
 local isDragging = false
 local dragStart = nil
@@ -67,10 +87,8 @@ UserInputService.InputChanged:Connect(function(input)
         local delta = input.Position - dragStart
         local newX = startPos.X.Scale + (delta.X / screenGui.AbsoluteSize.X)
         local newY = startPos.Y.Scale + (delta.Y / screenGui.AbsoluteSize.Y)
-        
         newX = math.clamp(newX, 0, 1 - logoBtn.Size.X.Scale)
         newY = math.clamp(newY, 0, 1 - logoBtn.Size.Y.Scale)
-        
         logoBtn.Position = UDim2.new(newX, 0, newY, 0)
     end
 end)
@@ -79,12 +97,11 @@ end)
 -- MENU PRINCIPAL
 -- ============================================
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 350, 0, 320)
-mainFrame.Position = UDim2.new(1, -365, 0, 80)
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+mainFrame.Size = UDim2.new(0, 380, 0, 360)
+mainFrame.Position = UDim2.new(1, -400, 0, 80)
+mainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 35)
 mainFrame.BackgroundTransparency = 0
-mainFrame.BorderSizePixel = 2
-mainFrame.BorderColor3 = Color3.fromRGB(80, 80, 120)
+mainFrame.BorderSizePixel = 0
 mainFrame.Visible = false
 mainFrame.Active = true
 mainFrame.Draggable = true
@@ -92,54 +109,89 @@ mainFrame.Parent = screenGui
 mainFrame.ZIndex = 998
 
 local mainCorner = Instance.new("UICorner")
-mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.CornerRadius = UDim.new(0, 14)
 mainCorner.Parent = mainFrame
 
+-- Ombre
+local shadow = Instance.new("Frame")
+shadow.Size = UDim2.new(1, 10, 1, 10)
+shadow.Position = UDim2.new(0, -5, 0, -5)
+shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+shadow.BackgroundTransparency = 0.6
+shadow.BorderSizePixel = 0
+shadow.ZIndex = -1
+shadow.Parent = mainFrame
+
+local shadowCorner = Instance.new("UICorner")
+shadowCorner.CornerRadius = UDim.new(0, 16)
+shadowCorner.Parent = shadow
+
 -- ============================================
--- BANDEAU
+-- BANDEAU HAUT
 -- ============================================
 local topBar = Instance.new("Frame")
-topBar.Size = UDim2.new(1, 0, 0, 40)
-topBar.BackgroundColor3 = Color3.fromRGB(70, 70, 100)
+topBar.Size = UDim2.new(1, 0, 0, 46)
+topBar.BackgroundColor3 = Color3.fromRGB(28, 28, 50)
 topBar.BorderSizePixel = 0
 topBar.Parent = mainFrame
 
 local topCorner = Instance.new("UICorner")
-topCorner.CornerRadius = UDim.new(0, 12)
+topCorner.CornerRadius = UDim.new(0, 14)
 topCorner.Parent = topBar
 
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -40, 1, 0)
-title.Position = UDim2.new(0, 10, 0, 0)
-title.Text = "⚡ PANEL"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.BackgroundTransparency = 1
-title.Font = Enum.Font.GothamBold
-title.TextSize = 18
-title.TextXAlignment = Enum.TextXAlignment.Left
-title.Parent = topBar
+-- Titre
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -50, 1, 0)
+titleLabel.Position = UDim2.new(0, 16, 0, 0)
+titleLabel.Text = "Visuals"
+titleLabel.TextColor3 = Color3.fromRGB(220, 220, 255)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextSize = 18
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = topBar
 
+-- Sous-titre
+local subTitle = Instance.new("TextLabel")
+subTitle.Size = UDim2.new(1, -50, 0, 16)
+subTitle.Position = UDim2.new(0, 16, 0, 26)
+subTitle.Text = "ESP / Combat"
+subTitle.TextColor3 = Color3.fromRGB(150, 150, 200)
+subTitle.BackgroundTransparency = 1
+subTitle.Font = Enum.Font.Gotham
+subTitle.TextSize = 11
+subTitle.TextXAlignment = Enum.TextXAlignment.Left
+subTitle.Parent = topBar
+
+-- Bouton fermer
 local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 35, 0, 35)
-closeBtn.Position = UDim2.new(1, -40, 0, 2)
+closeBtn.Size = UDim2.new(0, 34, 0, 34)
+closeBtn.Position = UDim2.new(1, -40, 0, 6)
 closeBtn.Text = "✕"
 closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
 closeBtn.BackgroundTransparency = 1
 closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextSize = 22
+closeBtn.TextSize = 20
 closeBtn.Parent = topBar
 
 closeBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = false
 end)
 
+closeBtn.MouseEnter:Connect(function()
+    closeBtn.TextColor3 = Color3.fromRGB(255, 50, 50)
+end)
+closeBtn.MouseLeave:Connect(function()
+    closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+end)
+
 -- ============================================
--- BARRE LATERALE GAUCHE (Navigation)
+-- BARRE LATERALE
 -- ============================================
 local sidebar = Instance.new("Frame")
-sidebar.Size = UDim2.new(0, 50, 1, -40)
-sidebar.Position = UDim2.new(0, 0, 0, 40)
-sidebar.BackgroundColor3 = Color3.fromRGB(30, 30, 55)
+sidebar.Size = UDim2.new(0, 56, 1, -46)
+sidebar.Position = UDim2.new(0, 0, 0, 46)
+sidebar.BackgroundColor3 = Color3.fromRGB(22, 22, 42)
 sidebar.BackgroundTransparency = 0
 sidebar.BorderSizePixel = 0
 sidebar.Parent = mainFrame
@@ -148,325 +200,389 @@ local sidebarCorner = Instance.new("UICorner")
 sidebarCorner.CornerRadius = UDim.new(0, 0)
 sidebarCorner.Parent = sidebar
 
--- ===== BOUTON ESP (Œil) =====
-local espNavBtn = Instance.new("TextButton")
-espNavBtn.Size = UDim2.new(1, -10, 0, 45)
-espNavBtn.Position = UDim2.new(0, 5, 0, 10)
-espNavBtn.Text = "👁️"
-espNavBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-espNavBtn.TextSize = 22
-espNavBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
-espNavBtn.BorderSizePixel = 1
-espNavBtn.BorderColor3 = Color3.fromRGB(100, 100, 160)
-espNavBtn.Font = Enum.Font.GothamBold
-espNavBtn.Parent = sidebar
-espNavBtn.ZIndex = 999
+-- Ligne séparatrice
+local separatorLine = Instance.new("Frame")
+separatorLine.Size = UDim2.new(0, 1, 1, -12)
+separatorLine.Position = UDim2.new(1, 0, 0, 6)
+separatorLine.BackgroundColor3 = Color3.fromRGB(60, 60, 100)
+separatorLine.BorderSizePixel = 0
+separatorLine.Parent = sidebar
 
-local espNavCorner = Instance.new("UICorner")
-espNavCorner.CornerRadius = UDim.new(0, 8)
-espNavCorner.Parent = espNavBtn
+-- ===== BOUTON VISUAL =====
+local visualNav = Instance.new("TextButton")
+visualNav.Size = UDim2.new(0, 40, 0, 40)
+visualNav.Position = UDim2.new(0.5, -20, 0, 14)
+visualNav.Text = "👁"
+visualNav.TextColor3 = Color3.fromRGB(255, 255, 255)
+visualNav.TextSize = 22
+visualNav.BackgroundColor3 = Color3.fromRGB(50, 50, 85)
+visualNav.BorderSizePixel = 0
+visualNav.Font = Enum.Font.GothamBold
+visualNav.Parent = sidebar
+visualNav.ZIndex = 999
 
--- Tooltip ESP
-local espTooltip = Instance.new("TextLabel")
-espTooltip.Size = UDim2.new(0, 60, 0, 25)
-espTooltip.Position = UDim2.new(1, 5, 0, 10)
-espTooltip.Text = "ESP"
-espTooltip.TextColor3 = Color3.fromRGB(255, 255, 255)
-espTooltip.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
-espTooltip.BorderSizePixel = 1
-espTooltip.BorderColor3 = Color3.fromRGB(80, 80, 120)
-espTooltip.Font = Enum.Font.Gotham
-espTooltip.TextSize = 12
-espTooltip.Visible = false
-espTooltip.Parent = sidebar
+local visualCorner = Instance.new("UICorner")
+visualCorner.CornerRadius = UDim.new(0, 10)
+visualCorner.Parent = visualNav
 
-local espTooltipCorner = Instance.new("UICorner")
-espTooltipCorner.CornerRadius = UDim.new(0, 4)
-espTooltipCorner.Parent = espTooltip
+-- Tooltip
+local visualTip = Instance.new("TextLabel")
+visualTip.Size = UDim2.new(0, 70, 0, 24)
+visualTip.Position = UDim2.new(0, 48, 0, 14)
+visualTip.Text = "Visuals"
+visualTip.TextColor3 = Color3.fromRGB(255, 255, 255)
+visualTip.BackgroundColor3 = Color3.fromRGB(18, 18, 35)
+visualTip.BorderSizePixel = 0
+visualTip.Font = Enum.Font.Gotham
+visualTip.TextSize = 12
+visualTip.Visible = false
+visualTip.Parent = sidebar
 
-espNavBtn.MouseEnter:Connect(function()
-    espTooltip.Visible = true
+local visualTipCorner = Instance.new("UICorner")
+visualTipCorner.CornerRadius = UDim.new(0, 6)
+visualTipCorner.Parent = visualTip
+
+visualNav.MouseEnter:Connect(function()
+    visualTip.Visible = true
 end)
-espNavBtn.MouseLeave:Connect(function()
-    espTooltip.Visible = false
+visualNav.MouseLeave:Connect(function()
+    visualTip.Visible = false
 end)
 
--- ===== BOUTON COMBAT (Épée) =====
-local combatNavBtn = Instance.new("TextButton")
-combatNavBtn.Size = UDim2.new(1, -10, 0, 45)
-combatNavBtn.Position = UDim2.new(0, 5, 0, 65)
-combatNavBtn.Text = "⚔️"
-combatNavBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-combatNavBtn.TextSize = 22
-combatNavBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
-combatNavBtn.BorderSizePixel = 1
-combatNavBtn.BorderColor3 = Color3.fromRGB(100, 100, 160)
-combatNavBtn.Font = Enum.Font.GothamBold
-combatNavBtn.Parent = sidebar
-combatNavBtn.ZIndex = 999
+-- ===== BOUTON COMBAT =====
+local combatNav = Instance.new("TextButton")
+combatNav.Size = UDim2.new(0, 40, 0, 40)
+combatNav.Position = UDim2.new(0.5, -20, 0, 68)
+combatNav.Text = "⚔"
+combatNav.TextColor3 = Color3.fromRGB(255, 255, 255)
+combatNav.TextSize = 22
+combatNav.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
+combatNav.BorderSizePixel = 0
+combatNav.Font = Enum.Font.GothamBold
+combatNav.Parent = sidebar
+combatNav.ZIndex = 999
 
-local combatNavCorner = Instance.new("UICorner")
-combatNavCorner.CornerRadius = UDim.new(0, 8)
-combatNavCorner.Parent = combatNavBtn
+local combatCorner = Instance.new("UICorner")
+combatCorner.CornerRadius = UDim.new(0, 10)
+combatCorner.Parent = combatNav
 
--- Tooltip Combat
-local combatTooltip = Instance.new("TextLabel")
-combatTooltip.Size = UDim2.new(0, 70, 0, 25)
-combatTooltip.Position = UDim2.new(1, 5, 0, 65)
-combatTooltip.Text = "Combat"
-combatTooltip.TextColor3 = Color3.fromRGB(255, 255, 255)
-combatTooltip.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
-combatTooltip.BorderSizePixel = 1
-combatTooltip.BorderColor3 = Color3.fromRGB(80, 80, 120)
-combatTooltip.Font = Enum.Font.Gotham
-combatTooltip.TextSize = 12
-combatTooltip.Visible = false
-combatTooltip.Parent = sidebar
+local combatTip = Instance.new("TextLabel")
+combatTip.Size = UDim2.new(0, 70, 0, 24)
+combatTip.Position = UDim2.new(0, 48, 0, 68)
+combatTip.Text = "Combat"
+combatTip.TextColor3 = Color3.fromRGB(255, 255, 255)
+combatTip.BackgroundColor3 = Color3.fromRGB(18, 18, 35)
+combatTip.BorderSizePixel = 0
+combatTip.Font = Enum.Font.Gotham
+combatTip.TextSize = 12
+combatTip.Visible = false
+combatTip.Parent = sidebar
 
-local combatTooltipCorner = Instance.new("UICorner")
-combatTooltipCorner.CornerRadius = UDim.new(0, 4)
-combatTooltipCorner.Parent = combatTooltip
+local combatTipCorner = Instance.new("UICorner")
+combatTipCorner.CornerRadius = UDim.new(0, 6)
+combatTipCorner.Parent = combatTip
 
-combatNavBtn.MouseEnter:Connect(function()
-    combatTooltip.Visible = true
+combatNav.MouseEnter:Connect(function()
+    combatTip.Visible = true
 end)
-combatNavBtn.MouseLeave:Connect(function()
-    combatTooltip.Visible = false
+combatNav.MouseLeave:Connect(function()
+    combatTip.Visible = false
 end)
 
 -- ============================================
 -- CONTENEUR DES SECTIONS
 -- ============================================
-local sectionContainer = Instance.new("Frame")
-sectionContainer.Size = UDim2.new(1, -60, 1, -40)
-sectionContainer.Position = UDim2.new(0, 55, 0, 40)
-sectionContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
-sectionContainer.BackgroundTransparency = 0
-sectionContainer.BorderSizePixel = 0
-sectionContainer.Parent = mainFrame
+local container = Instance.new("Frame")
+container.Size = UDim2.new(1, -62, 1, -52)
+container.Position = UDim2.new(0, 58, 0, 50)
+container.BackgroundColor3 = Color3.fromRGB(18, 18, 35)
+container.BackgroundTransparency = 0
+container.BorderSizePixel = 0
+container.Parent = mainFrame
 
 -- ============================================
--- SECTION ESP (visible par défaut)
+-- FONCTION POUR CRÉER UN SWITCH
 -- ============================================
-local espSection = Instance.new("Frame")
-espSection.Size = UDim2.new(1, 0, 1, 0)
-espSection.BackgroundTransparency = 1
-espSection.Parent = sectionContainer
-espSection.Visible = true
-
--- Titre de la section
-local espTitle = Instance.new("TextLabel")
-espTitle.Size = UDim2.new(1, 0, 0, 30)
-espTitle.Position = UDim2.new(0, 0, 0, 5)
-espTitle.Text = "👁️ VISUAL ESP"
-espTitle.TextColor3 = Color3.fromRGB(200, 200, 220)
-espTitle.BackgroundTransparency = 1
-espTitle.Font = Enum.Font.GothamBold
-espTitle.TextSize = 16
-espTitle.TextXAlignment = Enum.TextXAlignment.Center
-espTitle.Parent = espSection
-
--- BOUTONS ESP
-local espButtons = {}
-local espBtnData = {
-    {name = "ESP Players", y = 45, color = Color3.fromRGB(200, 50, 50)},
-    {name = "ESP Weapons", y = 90, color = Color3.fromRGB(50, 200, 50)},
-    {name = "Show Distance", y = 135, color = Color3.fromRGB(50, 100, 220)},
-    {name = "ESP ALL", y = 180, color = Color3.fromRGB(220, 180, 50)},
-}
-
-for _, data in ipairs(espBtnData) do
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.92, 0, 0, 38)
-    btn.Position = UDim2.new(0.04, 0, 0, data.y)
-    btn.Text = "◻ " .. data.name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 75)
-    btn.BorderSizePixel = 1
-    btn.BorderColor3 = Color3.fromRGB(120, 120, 160)
-    btn.BackgroundTransparency = 0
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 14
-    btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.Parent = espSection
-    btn.ZIndex = 999
+local function createSwitch(parent, yPos, labelText, descriptionText, defaultState)
+    local isOn = defaultState or false
     
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 8)
-    btnCorner.Parent = btn
+    -- Conteneur du switch
+    local switchContainer = Instance.new("Frame")
+    switchContainer.Size = UDim2.new(1, -8, 0, 44)
+    switchContainer.Position = UDim2.new(0, 4, 0, yPos)
+    switchContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 48)
+    switchContainer.BackgroundTransparency = 0
+    switchContainer.BorderSizePixel = 0
+    switchContainer.Parent = parent
     
-    btn.MouseEnter:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(70, 70, 100)
-    end)
-    btn.MouseLeave:Connect(function()
-        if btn.Text:sub(1,1) == "☑" then
-            btn.BackgroundColor3 = data.color
+    local containerCorner = Instance.new("UICorner")
+    containerCorner.CornerRadius = UDim.new(0, 8)
+    containerCorner.Parent = switchContainer
+    
+    -- Label
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 140, 1, 0)
+    label.Position = UDim2.new(0, 12, 0, 0)
+    label.Text = labelText
+    label.TextColor3 = Color3.fromRGB(220, 220, 240)
+    label.BackgroundTransparency = 1
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 13
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = switchContainer
+    
+    -- Description
+    local desc = Instance.new("TextLabel")
+    desc.Size = UDim2.new(0, 140, 0, 14)
+    desc.Position = UDim2.new(0, 12, 0, 24)
+    desc.Text = descriptionText
+    desc.TextColor3 = Color3.fromRGB(130, 130, 180)
+    desc.BackgroundTransparency = 1
+    desc.Font = Enum.Font.Gotham
+    desc.TextSize = 10
+    desc.TextXAlignment = Enum.TextXAlignment.Left
+    desc.Parent = switchContainer
+    
+    -- Fond du switch
+    local switchBg = Instance.new("Frame")
+    switchBg.Size = UDim2.new(0, 44, 0, 24)
+    switchBg.Position = UDim2.new(1, -54, 0.5, -12)
+    switchBg.BackgroundColor3 = isOn and Color3.fromRGB(60, 60, 180) or Color3.fromRGB(60, 60, 80)
+    switchBg.BackgroundTransparency = 0
+    switchBg.BorderSizePixel = 0
+    switchBg.Parent = switchContainer
+    
+    local switchCorner = Instance.new("UICorner")
+    switchCorner.CornerRadius = UDim.new(1, 0)
+    switchCorner.Parent = switchBg
+    
+    -- Curseur
+    local cursor = Instance.new("Frame")
+    cursor.Size = UDim2.new(0, 20, 0, 20)
+    cursor.Position = isOn and UDim2.new(1, -22, 0.5, -10) or UDim2.new(0, 2, 0.5, -10)
+    cursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    cursor.BackgroundTransparency = 0
+    cursor.BorderSizePixel = 0
+    cursor.Parent = switchBg
+    
+    local cursorCorner = Instance.new("UICorner")
+    cursorCorner.CornerRadius = UDim.new(1, 0)
+    cursorCorner.Parent = cursor
+    
+    -- Animation de switch
+    local function toggleSwitch()
+        isOn = not isOn
+        local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        if isOn then
+            TweenService:Create(switchBg, tweenInfo, {BackgroundColor3 = Color3.fromRGB(60, 60, 180)}):Play()
+            TweenService:Create(cursor, tweenInfo, {Position = UDim2.new(1, -22, 0.5, -10)}):Play()
         else
-            btn.BackgroundColor3 = Color3.fromRGB(50, 50, 75)
+            TweenService:Create(switchBg, tweenInfo, {BackgroundColor3 = Color3.fromRGB(60, 60, 80)}):Play()
+            TweenService:Create(cursor, tweenInfo, {Position = UDim2.new(0, 2, 0.5, -10)}):Play()
+        end
+        return isOn
+    end
+    
+    -- Clic sur le fond
+    switchBg.MouseButton1Click:Connect(function()
+        local newState = toggleSwitch()
+        if switchContainer._onToggle then
+            switchContainer._onToggle(newState)
         end
     end)
     
-    espButtons[data.name] = {
-        button = btn,
-        enabled = false,
-        color = data.color
-    }
+    -- Clic sur le curseur
+    cursor.MouseButton1Click:Connect(function()
+        local newState = toggleSwitch()
+        if switchContainer._onToggle then
+            switchContainer._onToggle(newState)
+        end
+    end)
+    
+    -- Fonction pour définir l'état
+    function switchContainer:setState(state)
+        if state ~= isOn then
+            toggleSwitch()
+        end
+    end
+    
+    function switchContainer:getState()
+        return isOn
+    end
+    
+    function switchContainer:onToggle(callback)
+        self._onToggle = callback
+    end
+    
+    return switchContainer
 end
 
--- Légende ESP
-local espLegend = Instance.new("Frame")
-espLegend.Size = UDim2.new(0.92, 0, 0, 30)
-espLegend.Position = UDim2.new(0.04, 0, 0, 230)
-espLegend.BackgroundColor3 = Color3.fromRGB(40, 40, 65)
-espLegend.BackgroundTransparency = 0
-espLegend.BorderSizePixel = 1
-espLegend.BorderColor3 = Color3.fromRGB(100, 100, 140)
-espLegend.Parent = espSection
+-- ============================================
+-- SECTION VISUAL (ESP)
+-- ============================================
+local visualSection = Instance.new("Frame")
+visualSection.Size = UDim2.new(1, 0, 1, 0)
+visualSection.BackgroundTransparency = 1
+visualSection.Parent = container
+visualSection.Visible = true
 
-local espLegendCorner = Instance.new("UICorner")
-espLegendCorner.CornerRadius = UDim.new(0, 6)
-espLegendCorner.Parent = espLegend
+-- Titre de section
+local visualSectionTitle = Instance.new("TextLabel")
+visualSectionTitle.Size = UDim2.new(1, 0, 0, 28)
+visualSectionTitle.Position = UDim2.new(0, 0, 0, 0)
+visualSectionTitle.Text = "VISUAL OPTIONS"
+visualSectionTitle.TextColor3 = Color3.fromRGB(180, 180, 220)
+visualSectionTitle.BackgroundTransparency = 1
+visualSectionTitle.Font = Enum.Font.GothamBold
+visualSectionTitle.TextSize = 14
+visualSectionTitle.TextXAlignment = Enum.TextXAlignment.Center
+visualSectionTitle.Parent = visualSection
 
-local espLegendText = Instance.new("TextLabel")
-espLegendText.Size = UDim2.new(1, 0, 1, 0)
-espLegendText.Text = "🔵 Sherif  🟢 Innocent  🔴 Murder  🟡 Hero"
-espLegendText.TextColor3 = Color3.fromRGB(255, 255, 255)
-espLegendText.BackgroundTransparency = 1
-espLegendText.Font = Enum.Font.Gotham
-espLegendText.TextSize = 11
-espLegendText.Parent = espLegend
+-- Switches Visuals
+local visualSwitches = {}
+
+local switchData = {
+    {name = "ESP Players", desc = "Highlight players", y = 34, default = false},
+    {name = "ESP Weapons", desc = "Highlight dropped weapons", y = 82, default = false},
+    {name = "Show Distance", desc = "Display distance to players", y = 130, default = false},
+    {name = "ESP All", desc = "Enable all ESP features", y = 178, default = false},
+}
+
+for _, data in ipairs(switchData) do
+    local sw = createSwitch(visualSection, data.y, data.name, data.desc, data.default)
+    visualSwitches[data.name] = sw
+end
+
+-- Légende
+local legendBox = Instance.new("Frame")
+legendBox.Size = UDim2.new(1, -12, 0, 40)
+legendBox.Position = UDim2.new(0, 6, 0, 232)
+legendBox.BackgroundColor3 = Color3.fromRGB(25, 25, 48)
+legendBox.BackgroundTransparency = 0
+legendBox.BorderSizePixel = 0
+legendBox.Parent = visualSection
+
+local legendCorner = Instance.new("UICorner")
+legendCorner.CornerRadius = UDim.new(0, 8)
+legendCorner.Parent = legendBox
+
+local legendText = Instance.new("TextLabel")
+legendText.Size = UDim2.new(1, 0, 1, 0)
+legendText.Text = "● Sheriff  ● Innocent  ● Murder  ● Hero"
+legendText.TextColor3 = Color3.fromRGB(180, 180, 220)
+legendText.BackgroundTransparency = 1
+legendText.Font = Enum.Font.Gotham
+legendText.TextSize = 12
+legendText.Parent = legendBox
+
+-- Couleurs de la légende (utilise des TextLabel séparés)
+local colors = {
+    {text = "Sheriff", color = Color3.fromRGB(0, 100, 255)},
+    {text = "Innocent", color = Color3.fromRGB(0, 255, 0)},
+    {text = "Murder", color = Color3.fromRGB(255, 0, 0)},
+    {text = "Hero", color = Color3.fromRGB(255, 215, 0)},
+}
+
+local xPos = 0
+for _, c in ipairs(colors) do
+    local dot = Instance.new("TextLabel")
+    dot.Size = UDim2.new(0, 60, 0, 14)
+    dot.Position = UDim2.new(0, 8 + xPos, 0, 26)
+    dot.Text = "● " .. c.text
+    dot.TextColor3 = c.color
+    dot.BackgroundTransparency = 1
+    dot.Font = Enum.Font.GothamBold
+    dot.TextSize = 11
+    dot.Parent = legendBox
+    xPos = xPos + 65
+end
 
 -- ============================================
--- SECTION COMBAT (cachée par défaut)
+-- SECTION COMBAT
 -- ============================================
 local combatSection = Instance.new("Frame")
 combatSection.Size = UDim2.new(1, 0, 1, 0)
 combatSection.BackgroundTransparency = 1
-combatSection.Parent = sectionContainer
+combatSection.Parent = container
 combatSection.Visible = false
 
--- Titre de la section
-local combatTitle = Instance.new("TextLabel")
-combatTitle.Size = UDim2.new(1, 0, 0, 30)
-combatTitle.Position = UDim2.new(0, 0, 0, 5)
-combatTitle.Text = "⚔️ COMBAT"
-combatTitle.TextColor3 = Color3.fromRGB(200, 200, 220)
-combatTitle.BackgroundTransparency = 1
-combatTitle.Font = Enum.Font.GothamBold
-combatTitle.TextSize = 16
-combatTitle.TextXAlignment = Enum.TextXAlignment.Center
-combatTitle.Parent = combatSection
+local combatSectionTitle = Instance.new("TextLabel")
+combatSectionTitle.Size = UDim2.new(1, 0, 0, 28)
+combatSectionTitle.Position = UDim2.new(0, 0, 0, 0)
+combatSectionTitle.Text = "COMBAT OPTIONS"
+combatSectionTitle.TextColor3 = Color3.fromRGB(180, 180, 220)
+combatSectionTitle.BackgroundTransparency = 1
+combatSectionTitle.Font = Enum.Font.GothamBold
+combatSectionTitle.TextSize = 14
+combatSectionTitle.TextXAlignment = Enum.TextXAlignment.Center
+combatSectionTitle.Parent = combatSection
 
--- Boutons Combat
-local combatButtons = {}
-local combatBtnData = {
-    {name = "Aimbot", y = 45, color = Color3.fromRGB(200, 50, 50)},
-    {name = "Triggerbot", y = 90, color = Color3.fromRGB(50, 200, 50)},
-    {name = "Auto Click", y = 135, color = Color3.fromRGB(50, 100, 220)},
-    {name = "Hitbox", y = 180, color = Color3.fromRGB(220, 180, 50)},
+local combatSwitches = {}
+
+local combatData = {
+    {name = "Aimbot", desc = "Auto aim at enemies", y = 34, default = false},
+    {name = "Triggerbot", desc = "Auto shoot when aiming", y = 82, default = false},
+    {name = "Auto Click", desc = "Auto click on targets", y = 130, default = false},
+    {name = "Hitbox", desc = "Show hitbox detection", y = 178, default = false},
 }
 
-for _, data in ipairs(combatBtnData) do
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.92, 0, 0, 38)
-    btn.Position = UDim2.new(0.04, 0, 0, data.y)
-    btn.Text = "◻ " .. data.name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 75)
-    btn.BorderSizePixel = 1
-    btn.BorderColor3 = Color3.fromRGB(120, 120, 160)
-    btn.BackgroundTransparency = 0
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 14
-    btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.Parent = combatSection
-    btn.ZIndex = 999
-    
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 8)
-    btnCorner.Parent = btn
-    
-    btn.MouseEnter:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(70, 70, 100)
-    end)
-    btn.MouseLeave:Connect(function()
-        if btn.Text:sub(1,1) == "☑" then
-            btn.BackgroundColor3 = data.color
-        else
-            btn.BackgroundColor3 = Color3.fromRGB(50, 50, 75)
-        end
-    end)
-    
-    -- Action temporaire (juste pour le fun)
-    btn.MouseButton1Click:Connect(function()
-        local state = btn.Text:sub(1,1) == "☑"
-        btn.Text = (not state and "☑ " or "◻ ") .. data.name
-        btn.BackgroundColor3 = not state and data.color or Color3.fromRGB(50, 50, 75)
-        print("📌 " .. data.name .. " = " .. tostring(not state))
-    end)
-    
-    combatButtons[data.name] = {
-        button = btn,
-        enabled = false,
-        color = data.color
-    }
+for _, data in ipairs(combatData) do
+    local sw = createSwitch(combatSection, data.y, data.name, data.desc, data.default)
+    combatSwitches[data.name] = sw
 end
 
--- Légende Combat
-local combatLegend = Instance.new("Frame")
-combatLegend.Size = UDim2.new(0.92, 0, 0, 30)
-combatLegend.Position = UDim2.new(0.04, 0, 0, 230)
-combatLegend.BackgroundColor3 = Color3.fromRGB(40, 40, 65)
-combatLegend.BackgroundTransparency = 0
-combatLegend.BorderSizePixel = 1
-combatLegend.BorderColor3 = Color3.fromRGB(100, 100, 140)
-combatLegend.Parent = combatSection
+-- Info combat
+local combatInfo = Instance.new("Frame")
+combatInfo.Size = UDim2.new(1, -12, 0, 34)
+combatInfo.Position = UDim2.new(0, 6, 0, 232)
+combatInfo.BackgroundColor3 = Color3.fromRGB(25, 25, 48)
+combatInfo.BackgroundTransparency = 0
+combatInfo.BorderSizePixel = 0
+combatInfo.Parent = combatSection
 
-local combatLegendCorner = Instance.new("UICorner")
-combatLegendCorner.CornerRadius = UDim.new(0, 6)
-combatLegendCorner.Parent = combatLegend
+local combatInfoCorner = Instance.new("UICorner")
+combatInfoCorner.CornerRadius = UDim.new(0, 8)
+combatInfoCorner.Parent = combatInfo
 
-local combatLegendText = Instance.new("TextLabel")
-combatLegendText.Size = UDim2.new(1, 0, 1, 0)
-combatLegendText.Text = "⚡ Fonctionnalités de combat"
-combatLegendText.TextColor3 = Color3.fromRGB(255, 255, 255)
-combatLegendText.BackgroundTransparency = 1
-combatLegendText.Font = Enum.Font.Gotham
-combatLegendText.TextSize = 11
-combatLegendText.Parent = combatLegend
+local combatInfoText = Instance.new("TextLabel")
+combatInfoText.Size = UDim2.new(1, 0, 1, 0)
+combatInfoText.Text = "Combat features will be added here"
+combatInfoText.TextColor3 = Color3.fromRGB(150, 150, 200)
+combatInfoText.BackgroundTransparency = 1
+combatInfoText.Font = Enum.Font.Gotham
+combatInfoText.TextSize = 12
+combatInfoText.Parent = combatInfo
 
 -- ============================================
--- NAVIGATION ENTRE LES SECTIONS
+-- NAVIGATION
 -- ============================================
-local currentSection = "ESP"
+local currentSection = "Visual"
 
 local function switchSection(section)
     currentSection = section
-    
-    -- Cacher toutes les sections
-    espSection.Visible = false
+    visualSection.Visible = false
     combatSection.Visible = false
     
-    -- Afficher la section demandée
-    if section == "ESP" then
-        espSection.Visible = true
-        espNavBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
-        combatNavBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
-        title.Text = "👁️ ESP PANEL"
+    if section == "Visual" then
+        visualSection.Visible = true
+        visualNav.BackgroundColor3 = Color3.fromRGB(50, 50, 85)
+        combatNav.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
+        titleLabel.Text = "Visuals"
+        subTitle.Text = "ESP / Visual Enhancements"
     elseif section == "Combat" then
         combatSection.Visible = true
-        combatNavBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
-        espNavBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
-        title.Text = "⚔️ COMBAT PANEL"
+        combatNav.BackgroundColor3 = Color3.fromRGB(50, 50, 85)
+        visualNav.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
+        titleLabel.Text = "Combat"
+        subTitle.Text = "Aimbot / Triggerbot / Auto"
     end
 end
 
--- Connexion des boutons de navigation
-espNavBtn.MouseButton1Click:Connect(function()
-    switchSection("ESP")
+visualNav.MouseButton1Click:Connect(function()
+    switchSection("Visual")
 end)
 
-combatNavBtn.MouseButton1Click:Connect(function()
+combatNav.MouseButton1Click:Connect(function()
     switchSection("Combat")
 end)
 
@@ -474,31 +590,4 @@ end)
 -- OUVERTURE / FERMETURE
 -- ============================================
 local function toggleMenu()
-    mainFrame.Visible = not mainFrame.Visible
-    print("📌 Menu visible:", mainFrame.Visible)
-end
-
-logoBtn.MouseButton1Click:Connect(function()
-    if not isDragging then
-        toggleMenu()
-    end
-end)
-
-UserInputService.InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.F8 then
-        toggleMenu()
-    end
-end)
-
--- ============================================
--- STOCKAGE
--- ============================================
-_G.ESP.screenGui = screenGui
-_G.ESP.mainFrame = mainFrame
-_G.ESP.logoBtn = logoBtn
-_G.ESP.buttons = espButtons  -- Les boutons ESP pour les modules
-_G.ESP.combatButtons = combatButtons  -- Les boutons Combat
-
-print("   ✅ [MENU] Interface chargée !")
-print("   📌 Sections: 👁️ ESP | ⚔️ Combat")
-return true
+    mainFrame.Visib
