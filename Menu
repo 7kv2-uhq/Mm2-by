@@ -1,5 +1,6 @@
 --[[
-    🔥 MENU - Version stable (sans TweenService)
+    🔥 MENU - Style Project Reverse
+    Avec catégories : Gameplay, ESP, Auto Farm, Coin Farm, etc.
 ]]
 
 print("   📦 [MENU] Création de l'interface...")
@@ -17,7 +18,7 @@ screenGui.Parent = player:WaitForChild("PlayerGui")
 screenGui.ResetOnSpawn = false
 
 -- ============================================
--- LOGO BOUTON (TextButton au lieu de ImageButton)
+-- LOGO BOUTON
 -- ============================================
 local logoBtn = Instance.new("TextButton")
 logoBtn.Size = UDim2.new(0, 48, 0, 48)
@@ -81,9 +82,9 @@ end)
 -- MENU PRINCIPAL
 -- ============================================
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 380, 0, 360)
-mainFrame.Position = UDim2.new(1, -400, 0, 80)
-mainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 35)
+mainFrame.Size = UDim2.new(0, 450, 0, 480)
+mainFrame.Position = UDim2.new(0.5, -225, 0.5, -240)
+mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
 mainFrame.BackgroundTransparency = 0
 mainFrame.BorderSizePixel = 0
 mainFrame.Visible = false
@@ -100,8 +101,8 @@ mainCorner.Parent = mainFrame
 -- BANDEAU HAUT
 -- ============================================
 local topBar = Instance.new("Frame")
-topBar.Size = UDim2.new(1, 0, 0, 46)
-topBar.BackgroundColor3 = Color3.fromRGB(28, 28, 50)
+topBar.Size = UDim2.new(1, 0, 0, 50)
+topBar.BackgroundColor3 = Color3.fromRGB(25, 25, 50)
 topBar.BorderSizePixel = 0
 topBar.Parent = mainFrame
 
@@ -109,12 +110,12 @@ local topCorner = Instance.new("UICorner")
 topCorner.CornerRadius = UDim.new(0, 14)
 topCorner.Parent = topBar
 
--- Titre
+-- Titre principal
 local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, -50, 1, 0)
-titleLabel.Position = UDim2.new(0, 16, 0, 0)
-titleLabel.Text = "Visuals"
-titleLabel.TextColor3 = Color3.fromRGB(220, 220, 255)
+titleLabel.Size = UDim2.new(1, -60, 0, 28)
+titleLabel.Position = UDim2.new(0, 16, 0, 8)
+titleLabel.Text = "Project Reverse [MM2]"
+titleLabel.TextColor3 = Color3.fromRGB(255, 200, 80)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextSize = 18
@@ -123,9 +124,9 @@ titleLabel.Parent = topBar
 
 -- Sous-titre
 local subTitle = Instance.new("TextLabel")
-subTitle.Size = UDim2.new(1, -50, 0, 16)
-subTitle.Position = UDim2.new(0, 16, 0, 26)
-subTitle.Text = "ESP / Combat"
+subTitle.Size = UDim2.new(1, -60, 0, 16)
+subTitle.Position = UDim2.new(0, 16, 0, 30)
+subTitle.Text = "By Project Reverse [Egorikusa]"
 subTitle.TextColor3 = Color3.fromRGB(150, 150, 200)
 subTitle.BackgroundTransparency = 1
 subTitle.Font = Enum.Font.Gotham
@@ -136,7 +137,7 @@ subTitle.Parent = topBar
 -- Bouton fermer
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 34, 0, 34)
-closeBtn.Position = UDim2.new(1, -40, 0, 6)
+closeBtn.Position = UDim2.new(1, -42, 0, 8)
 closeBtn.Text = "✕"
 closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
 closeBtn.BackgroundTransparency = 1
@@ -156,70 +157,103 @@ closeBtn.MouseLeave:Connect(function()
 end)
 
 -- ============================================
--- BARRE LATERALE
+-- CATÉGORIES (Liste à gauche)
 -- ============================================
-local sidebar = Instance.new("Frame")
-sidebar.Size = UDim2.new(0, 56, 1, -46)
-sidebar.Position = UDim2.new(0, 0, 0, 46)
-sidebar.BackgroundColor3 = Color3.fromRGB(22, 22, 42)
-sidebar.BackgroundTransparency = 0
-sidebar.BorderSizePixel = 0
-sidebar.Parent = mainFrame
+local categoryList = Instance.new("ScrollingFrame")
+categoryList.Size = UDim2.new(0, 160, 1, -50)
+categoryList.Position = UDim2.new(0, 0, 0, 50)
+categoryList.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
+categoryList.BackgroundTransparency = 0
+categoryList.BorderSizePixel = 0
+categoryList.CanvasSize = UDim2.new(0, 0, 0, 500)
+categoryList.ScrollBarThickness = 3
+categoryList.Parent = mainFrame
 
--- ===== BOUTON VISUAL =====
-local visualNav = Instance.new("TextButton")
-visualNav.Size = UDim2.new(0, 40, 0, 40)
-visualNav.Position = UDim2.new(0.5, -20, 0, 14)
-visualNav.Text = "👁"
-visualNav.TextColor3 = Color3.fromRGB(255, 255, 255)
-visualNav.TextSize = 22
-visualNav.BackgroundColor3 = Color3.fromRGB(50, 50, 85)
-visualNav.BorderSizePixel = 0
-visualNav.Font = Enum.Font.GothamBold
-visualNav.Parent = sidebar
-visualNav.ZIndex = 999
-
-local visualCorner = Instance.new("UICorner")
-visualCorner.CornerRadius = UDim.new(0, 10)
-visualCorner.Parent = visualNav
-
--- ===== BOUTON COMBAT =====
-local combatNav = Instance.new("TextButton")
-combatNav.Size = UDim2.new(0, 40, 0, 40)
-combatNav.Position = UDim2.new(0.5, -20, 0, 68)
-combatNav.Text = "⚔"
-combatNav.TextColor3 = Color3.fromRGB(255, 255, 255)
-combatNav.TextSize = 22
-combatNav.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
-combatNav.BorderSizePixel = 0
-combatNav.Font = Enum.Font.GothamBold
-combatNav.Parent = sidebar
-combatNav.ZIndex = 999
-
-local combatCorner = Instance.new("UICorner")
-combatCorner.CornerRadius = UDim.new(0, 10)
-combatCorner.Parent = combatNav
+local categoryCorner = Instance.new("UICorner")
+categoryCorner.CornerRadius = UDim.new(0, 0)
+categoryCorner.Parent = categoryList
 
 -- ============================================
--- CONTENEUR DES SECTIONS
+-- CONTENEUR DES CONTENUS (à droite)
 -- ============================================
-local container = Instance.new("Frame")
-container.Size = UDim2.new(1, -62, 1, -52)
-container.Position = UDim2.new(0, 58, 0, 50)
-container.BackgroundColor3 = Color3.fromRGB(18, 18, 35)
-container.BackgroundTransparency = 0
-container.BorderSizePixel = 0
-container.Parent = mainFrame
+local contentContainer = Instance.new("Frame")
+contentContainer.Size = UDim2.new(1, -170, 1, -58)
+contentContainer.Position = UDim2.new(0, 166, 0, 54)
+contentContainer.BackgroundColor3 = Color3.fromRGB(18, 18, 35)
+contentContainer.BackgroundTransparency = 0
+contentContainer.BorderSizePixel = 0
+contentContainer.Parent = mainFrame
+
+local contentCorner = Instance.new("UICorner")
+contentCorner.CornerRadius = UDim.new(0, 10)
+contentCorner.Parent = contentContainer
 
 -- ============================================
--- FONCTION POUR CRÉER UN SWITCH (sans TweenService)
+-- CATÉGORIES
+-- ============================================
+local categories = {}
+local currentCategory = nil
+local categoryButtons = {}
+
+local categoryData = {
+    {name = "Gameplay", icon = "🎮"},
+    {name = "ESP", icon = "👁"},
+    {name = "Auto Farm", icon = "⚡"},
+    {name = "Coin Farm", icon = "💰"},
+    {name = "Trade Helper", icon = "🤝"},
+    {name = "Inventory Helper", icon = "📦"},
+    {name = "Spawner & Crate Opener", icon = "📦"},
+    {name = "Misc", icon = "⚙"},
+    {name = "Valentine Farm", icon = "❤"},
+}
+
+-- ============================================
+-- FONCTION POUR CRÉER UN CATÉGORIE
+-- ============================================
+local function createCategoryButton(name, icon, yPos)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -8, 0, 38)
+    btn.Position = UDim2.new(0, 4, 0, yPos)
+    btn.Text = icon .. "  " .. name
+    btn.TextColor3 = Color3.fromRGB(200, 200, 220)
+    btn.BackgroundColor3 = Color3.fromRGB(25, 25, 50)
+    btn.BackgroundTransparency = 0
+    btn.BorderSizePixel = 0
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 13
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.Parent = categoryList
+    btn.ZIndex = 999
+    btn.Name = "Category_" .. name
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 8)
+    btnCorner.Parent = btn
+    
+    -- Hover
+    btn.MouseEnter:Connect(function()
+        if currentCategory ~= name then
+            btn.BackgroundColor3 = Color3.fromRGB(35, 35, 65)
+        end
+    end)
+    btn.MouseLeave:Connect(function()
+        if currentCategory ~= name then
+            btn.BackgroundColor3 = Color3.fromRGB(25, 25, 50)
+        end
+    end)
+    
+    return btn
+end
+
+-- ============================================
+-- FONCTION POUR CRÉER UN SWITCH
 -- ============================================
 local function createSwitch(parent, yPos, labelText, descriptionText, defaultState)
     local isOn = defaultState or false
     
     local switchContainer = Instance.new("Frame")
-    switchContainer.Size = UDim2.new(1, -8, 0, 44)
-    switchContainer.Position = UDim2.new(0, 4, 0, yPos)
+    switchContainer.Size = UDim2.new(1, -12, 0, 44)
+    switchContainer.Position = UDim2.new(0, 6, 0, yPos)
     switchContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 48)
     switchContainer.BackgroundTransparency = 0
     switchContainer.BorderSizePixel = 0
@@ -231,7 +265,7 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
     
     -- Label
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0, 140, 1, 0)
+    label.Size = UDim2.new(0, 160, 1, 0)
     label.Position = UDim2.new(0, 12, 0, 0)
     label.Text = labelText
     label.TextColor3 = Color3.fromRGB(220, 220, 240)
@@ -243,7 +277,7 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
     
     -- Description
     local desc = Instance.new("TextLabel")
-    desc.Size = UDim2.new(0, 140, 0, 14)
+    desc.Size = UDim2.new(0, 160, 0, 14)
     desc.Position = UDim2.new(0, 12, 0, 24)
     desc.Text = descriptionText
     desc.TextColor3 = Color3.fromRGB(130, 130, 180)
@@ -279,7 +313,7 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
     cursorCorner.CornerRadius = UDim.new(1, 0)
     cursorCorner.Parent = cursor
     
-    -- Fonction toggle (sans TweenService)
+    -- Toggle
     local function toggleSwitch()
         isOn = not isOn
         if isOn then
@@ -292,7 +326,6 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
         return isOn
     end
     
-    -- Clic sur le fond
     switchBg.MouseButton1Click:Connect(function()
         local newState = toggleSwitch()
         if switchContainer._onToggle then
@@ -300,7 +333,6 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
         end
     end)
     
-    -- Clic sur le curseur
     cursor.MouseButton1Click:Connect(function()
         local newState = toggleSwitch()
         if switchContainer._onToggle then
@@ -308,7 +340,6 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
         end
     end)
     
-    -- Fonctions publiques
     function switchContainer:setState(state)
         if state ~= isOn then
             toggleSwitch()
@@ -327,162 +358,196 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
 end
 
 -- ============================================
--- SECTION VISUAL
+-- CRÉATION DES CATÉGORIES
 -- ============================================
-local visualSection = Instance.new("Frame")
-visualSection.Size = UDim2.new(1, 0, 1, 0)
-visualSection.BackgroundTransparency = 1
-visualSection.Parent = container
-visualSection.Visible = true
+local yOffset = 6
+local categoryContent = {}
 
-local visualSectionTitle = Instance.new("TextLabel")
-visualSectionTitle.Size = UDim2.new(1, 0, 0, 28)
-visualSectionTitle.Position = UDim2.new(0, 0, 0, 0)
-visualSectionTitle.Text = "VISUAL OPTIONS"
-visualSectionTitle.TextColor3 = Color3.fromRGB(180, 180, 220)
-visualSectionTitle.BackgroundTransparency = 1
-visualSectionTitle.Font = Enum.Font.GothamBold
-visualSectionTitle.TextSize = 14
-visualSectionTitle.TextXAlignment = Enum.TextXAlignment.Center
-visualSectionTitle.Parent = visualSection
-
-local visualSwitches = {}
-
-local switchData = {
-    {name = "ESP Players", desc = "Highlight players", y = 34, default = false},
-    {name = "ESP Weapons", desc = "Highlight dropped weapons", y = 82, default = false},
-    {name = "Show Distance", desc = "Display distance to players", y = 130, default = false},
-    {name = "ESP All", desc = "Enable all ESP features", y = 178, default = false},
-}
-
-for _, data in ipairs(switchData) do
-    local sw = createSwitch(visualSection, data.y, data.name, data.desc, data.default)
-    visualSwitches[data.name] = sw
-end
-
--- Légende
-local legendBox = Instance.new("Frame")
-legendBox.Size = UDim2.new(1, -12, 0, 40)
-legendBox.Position = UDim2.new(0, 6, 0, 232)
-legendBox.BackgroundColor3 = Color3.fromRGB(25, 25, 48)
-legendBox.BackgroundTransparency = 0
-legendBox.BorderSizePixel = 0
-legendBox.Parent = visualSection
-
-local legendCorner = Instance.new("UICorner")
-legendCorner.CornerRadius = UDim.new(0, 8)
-legendCorner.Parent = legendBox
-
--- Couleurs de la légende
-local colors = {
-    {text = "Sheriff", color = Color3.fromRGB(0, 100, 255)},
-    {text = "Innocent", color = Color3.fromRGB(0, 255, 0)},
-    {text = "Murder", color = Color3.fromRGB(255, 0, 0)},
-    {text = "Hero", color = Color3.fromRGB(255, 215, 0)},
-}
-
-local xPos = 8
-for _, c in ipairs(colors) do
-    local dot = Instance.new("TextLabel")
-    dot.Size = UDim2.new(0, 60, 0, 16)
-    dot.Position = UDim2.new(0, xPos, 0, 22)
-    dot.Text = "● " .. c.text
-    dot.TextColor3 = c.color
-    dot.BackgroundTransparency = 1
-    dot.Font = Enum.Font.GothamBold
-    dot.TextSize = 11
-    dot.Parent = legendBox
-    xPos = xPos + 65
-end
-
--- ============================================
--- SECTION COMBAT
--- ============================================
-local combatSection = Instance.new("Frame")
-combatSection.Size = UDim2.new(1, 0, 1, 0)
-combatSection.BackgroundTransparency = 1
-combatSection.Parent = container
-combatSection.Visible = false
-
-local combatSectionTitle = Instance.new("TextLabel")
-combatSectionTitle.Size = UDim2.new(1, 0, 0, 28)
-combatSectionTitle.Position = UDim2.new(0, 0, 0, 0)
-combatSectionTitle.Text = "COMBAT OPTIONS"
-combatSectionTitle.TextColor3 = Color3.fromRGB(180, 180, 220)
-combatSectionTitle.BackgroundTransparency = 1
-combatSectionTitle.Font = Enum.Font.GothamBold
-combatSectionTitle.TextSize = 14
-combatSectionTitle.TextXAlignment = Enum.TextXAlignment.Center
-combatSectionTitle.Parent = combatSection
-
-local combatSwitches = {}
-
-local combatData = {
-    {name = "Aimbot", desc = "Auto aim at enemies", y = 34, default = false},
-    {name = "Triggerbot", desc = "Auto shoot when aiming", y = 82, default = false},
-    {name = "Auto Click", desc = "Auto click on targets", y = 130, default = false},
-    {name = "Hitbox", desc = "Show hitbox detection", y = 178, default = false},
-}
-
-for _, data in ipairs(combatData) do
-    local sw = createSwitch(combatSection, data.y, data.name, data.desc, data.default)
-    combatSwitches[data.name] = sw
-end
-
--- Info combat
-local combatInfo = Instance.new("Frame")
-combatInfo.Size = UDim2.new(1, -12, 0, 34)
-combatInfo.Position = UDim2.new(0, 6, 0, 232)
-combatInfo.BackgroundColor3 = Color3.fromRGB(25, 25, 48)
-combatInfo.BackgroundTransparency = 0
-combatInfo.BorderSizePixel = 0
-combatInfo.Parent = combatSection
-
-local combatInfoCorner = Instance.new("UICorner")
-combatInfoCorner.CornerRadius = UDim.new(0, 8)
-combatInfoCorner.Parent = combatInfo
-
-local combatInfoText = Instance.new("TextLabel")
-combatInfoText.Size = UDim2.new(1, 0, 1, 0)
-combatInfoText.Text = "Combat features will be added here"
-combatInfoText.TextColor3 = Color3.fromRGB(150, 150, 200)
-combatInfoText.BackgroundTransparency = 1
-combatInfoText.Font = Enum.Font.Gotham
-combatInfoText.TextSize = 12
-combatInfoText.Parent = combatInfo
-
--- ============================================
--- NAVIGATION
--- ============================================
-local currentSection = "Visual"
-
-local function switchSection(section)
-    currentSection = section
-    visualSection.Visible = false
-    combatSection.Visible = false
+for _, data in ipairs(categoryData) do
+    local btn = createCategoryButton(data.name, data.icon, yOffset)
+    categoryButtons[data.name] = btn
+    yOffset = yOffset + 44
     
-    if section == "Visual" then
-        visualSection.Visible = true
-        visualNav.BackgroundColor3 = Color3.fromRGB(50, 50, 85)
-        combatNav.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
-        titleLabel.Text = "Visuals"
-        subTitle.Text = "ESP / Visual Enhancements"
-    elseif section == "Combat" then
-        combatSection.Visible = true
-        combatNav.BackgroundColor3 = Color3.fromRGB(50, 50, 85)
-        visualNav.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
-        titleLabel.Text = "Combat"
-        subTitle.Text = "Aimbot / Triggerbot / Auto"
+    -- Créer le contenu de la catégorie (caché par défaut)
+    local content = Instance.new("Frame")
+    content.Size = UDim2.new(1, 0, 1, 0)
+    content.BackgroundTransparency = 1
+    content.Visible = false
+    content.Parent = contentContainer
+    content.Name = "Content_" .. data.name
+    
+    categoryContent[data.name] = content
+end
+
+-- ============================================
+-- REMPLIR LES CONTENUS DES CATÉGORIES
+-- ============================================
+
+-- === GAMEPLAY ===
+local gpContent = categoryContent["Gameplay"]
+local gpSwitches = {}
+local gpData = {
+    {name = "Auto Click", desc = "Auto click on targets", y = 10, default = false},
+    {name = "Auto Collect", desc = "Auto collect coins", y = 58, default = false},
+    {name = "Auto Quest", desc = "Auto complete quests", y = 106, default = false},
+}
+for _, d in ipairs(gpData) do
+    local sw = createSwitch(gpContent, d.y, d.name, d.desc, d.default)
+    gpSwitches[d.name] = sw
+end
+
+-- === ESP ===
+local espContent = categoryContent["ESP"]
+local espSwitches = {}
+local espData = {
+    {name = "ESP Players", desc = "Highlight players", y = 10, default = false},
+    {name = "ESP Weapons", desc = "Highlight dropped weapons", y = 58, default = false},
+    {name = "Show Distance", desc = "Display distance to players", y = 106, default = false},
+    {name = "Show Health", desc = "Display health bars", y = 154, default = false},
+}
+for _, d in ipairs(espData) do
+    local sw = createSwitch(espContent, d.y, d.name, d.desc, d.default)
+    espSwitches[d.name] = sw
+end
+
+-- Légende ESP
+local espLegend = Instance.new("Frame")
+espLegend.Size = UDim2.new(1, -12, 0, 34)
+espLegend.Position = UDim2.new(0, 6, 0, 210)
+espLegend.BackgroundColor3 = Color3.fromRGB(25, 25, 48)
+espLegend.BackgroundTransparency = 0
+espLegend.BorderSizePixel = 0
+espLegend.Parent = espContent
+
+local espLegendCorner = Instance.new("UICorner")
+espLegendCorner.CornerRadius = UDim.new(0, 8)
+espLegendCorner.Parent = espLegend
+
+local espLegendText = Instance.new("TextLabel")
+espLegendText.Size = UDim2.new(1, 0, 1, 0)
+espLegendText.Text = "● Sheriff  ● Innocent  ● Murder  ● Hero"
+espLegendText.TextColor3 = Color3.fromRGB(180, 180, 220)
+espLegendText.BackgroundTransparency = 1
+espLegendText.Font = Enum.Font.Gotham
+espLegendText.TextSize = 11
+espLegendText.Parent = espLegend
+
+-- === AUTO FARM ===
+local afContent = categoryContent["Auto Farm"]
+local afSwitches = {}
+local afData = {
+    {name = "Auto Farm", desc = "Auto farm coins", y = 10, default = false},
+    {name = "Auto Rebirth", desc = "Auto rebirth when available", y = 58, default = false},
+}
+for _, d in ipairs(afData) do
+    local sw = createSwitch(afContent, d.y, d.name, d.desc, d.default)
+    afSwitches[d.name] = sw
+end
+
+-- === COIN FARM ===
+local cfContent = categoryContent["Coin Farm"]
+local cfSwitches = {}
+local cfData = {
+    {name = "Coin Farm", desc = "Farm coins automatically", y = 10, default = false},
+    {name = "Double Coins", desc = "Double coin multiplier", y = 58, default = false},
+}
+for _, d in ipairs(cfData) do
+    local sw = createSwitch(cfContent, d.y, d.name, d.desc, d.default)
+    cfSwitches[d.name] = sw
+end
+
+-- === TRADE HELPER ===
+local thContent = categoryContent["Trade Helper"]
+local thSwitches = {}
+local thData = {
+    {name = "Auto Trade", desc = "Auto accept trades", y = 10, default = false},
+    {name = "Trade Alerts", desc = "Show trade notifications", y = 58, default = false},
+}
+for _, d in ipairs(thData) do
+    local sw = createSwitch(thContent, d.y, d.name, d.desc, d.default)
+    thSwitches[d.name] = sw
+end
+
+-- === INVENTORY HELPER ===
+local ihContent = categoryContent["Inventory Helper"]
+local ihSwitches = {}
+local ihData = {
+    {name = "Show Rarity", desc = "Display item rarity", y = 10, default = false},
+    {name = "Auto Sell", desc = "Auto sell common items", y = 58, default = false},
+}
+for _, d in ipairs(ihData) do
+    local sw = createSwitch(ihContent, d.y, d.name, d.desc, d.default)
+    ihSwitches[d.name] = sw
+end
+
+-- === SPAWNER & CRATE OPENER ===
+local scContent = categoryContent["Spawner & Crate Opener"]
+local scSwitches = {}
+local scData = {
+    {name = "Auto Open", desc = "Auto open crates", y = 10, default = false},
+    {name = "Spawn Items", desc = "Spawn items automatically", y = 58, default = false},
+}
+for _, d in ipairs(scData) do
+    local sw = createSwitch(scContent, d.y, d.name, d.desc, d.default)
+    scSwitches[d.name] = sw
+end
+
+-- === MISC ===
+local miscContent = categoryContent["Misc"]
+local miscSwitches = {}
+local miscData = {
+    {name = "Hide UI", desc = "Hide game UI", y = 10, default = false},
+    {name = "FPS Boost", desc = "Boost FPS", y = 58, default = false},
+}
+for _, d in ipairs(miscData) do
+    local sw = createSwitch(miscContent, d.y, d.name, d.desc, d.default)
+    miscSwitches[d.name] = sw
+end
+
+-- === VALENTINE FARM ===
+local vfContent = categoryContent["Valentine Farm"]
+local vfSwitches = {}
+local vfData = {
+    {name = "Valentine Farm", desc = "Farm Valentine event", y = 10, default = false},
+    {name = "Auto Gift", desc = "Auto send gifts", y = 58, default = false},
+}
+for _, d in ipairs(vfData) do
+    local sw = createSwitch(vfContent, d.y, d.name, d.desc, d.default)
+    vfSwitches[d.name] = sw
+end
+
+-- ============================================
+-- NAVIGATION ENTRE CATÉGORIES
+-- ============================================
+local function switchCategory(categoryName)
+    -- Cacher toutes les catégories
+    for name, content in pairs(categoryContent) do
+        content.Visible = false
+    end
+    
+    -- Désélectionner tous les boutons
+    for name, btn in pairs(categoryButtons) do
+        btn.BackgroundColor3 = Color3.fromRGB(25, 25, 50)
+    end
+    
+    -- Afficher la catégorie sélectionnée
+    if categoryContent[categoryName] then
+        categoryContent[categoryName].Visible = true
+        categoryButtons[categoryName].BackgroundColor3 = Color3.fromRGB(45, 45, 80)
+        currentCategory = categoryName
+        print("📌 Catégorie: " .. categoryName)
     end
 end
 
-visualNav.MouseButton1Click:Connect(function()
-    switchSection("Visual")
-end)
+-- Connecter les boutons
+for name, btn in pairs(categoryButtons) do
+    btn.MouseButton1Click:Connect(function()
+        switchCategory(name)
+    end)
+end
 
-combatNav.MouseButton1Click:Connect(function()
-    switchSection("Combat")
-end)
+-- Sélectionner la première catégorie par défaut
+switchCategory("Gameplay")
 
 -- ============================================
 -- OUVERTURE / FERMETURE
@@ -511,13 +576,20 @@ _G.ESP.screenGui = screenGui
 _G.ESP.mainFrame = mainFrame
 _G.ESP.logoBtn = logoBtn
 _G.ESP.switches = {
-    visual = visualSwitches,
-    combat = combatSwitches
+    gameplay = gpSwitches,
+    esp = espSwitches,
+    autofarm = afSwitches,
+    coinfarm = cfSwitches,
+    tradehelper = thSwitches,
+    inventoryhelper = ihSwitches,
+    spawner = scSwitches,
+    misc = miscSwitches,
+    valentine = vfSwitches,
 }
-_G.ESP.buttons = {}
-_G.ESP.switchSection = switchSection
+_G.ESP.categories = categoryContent
+_G.ESP.switchCategory = switchCategory
 
-print("   ✅ [MENU] Interface chargée !")
-print("   📌 Switches: OK | Navigation: OK")
+print("   ✅ [MENU] Interface Project Reverse chargée !")
+print("   📌 " .. #categoryData .. " catégories disponibles")
 
 return true
