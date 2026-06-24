@@ -1,5 +1,6 @@
 --[[
-    🔥 ESP PLAYERS - Connecté aux switches
+    🔥 ESP PLAYERS - Connecté aux switches du menu
+    À mettre dans le loadstring "Esp player"
 ]]
 
 print("   📦 [ESP_PLAYERS] Démarrage...")
@@ -8,8 +9,11 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
+-- ============================================
+-- VARIABLES
+-- ============================================
 local espObjects = {}
-local enabled = false
+local espEnabled = false
 local screenGui = nil
 
 -- MÉMOIRE DES RÔLES
@@ -23,7 +27,9 @@ local COLORS = {
     Innocent = Color3.fromRGB(0, 255, 0),
 }
 
--- ===== DÉTECTION DU RÔLE =====
+-- ============================================
+-- DÉTECTION DU RÔLE
+-- ============================================
 local function detectRoleByTools(character)
     if not character then return nil end
     
@@ -62,7 +68,6 @@ local function getPlayerRole(targetPlayer)
         local role = detectRoleByTools(targetPlayer.Character)
         if role then
             roleMemory[name] = role
-            print("   ✅ " .. name .. " → " .. role)
             return role
         end
     end
@@ -71,9 +76,11 @@ local function getPlayerRole(targetPlayer)
     return "Innocent"
 end
 
--- ===== MISE À JOUR ESP =====
+-- ============================================
+-- MISE À JOUR ESP
+-- ============================================
 local function updateESP()
-    if not enabled then
+    if not espEnabled then
         for _, obj in pairs(espObjects) do
             pcall(function() obj:Destroy() end)
         end
@@ -126,22 +133,31 @@ local function updateESP()
 end
 
 -- ============================================
--- 🔹 CONNEXION AU SWITCH
+-- 🔹 CONNEXION AU SWITCH "ESP Players"
+-- C'EST ICI QUE ÇA SE PASSE !
 -- ============================================
 local function connectToSwitch()
-    local switches = _G.ESP and _G.ESP.switches and _G.ESP.switches.visual
+    -- Récupère les switches depuis _G.ESP
+    local switches = _G.ESP and _G.ESP.switches and _G.ESP.switches.esp
+    
     if not switches then
+        print("   ⚠️ [ESP_PLAYERS] En attente du menu...")
         task.wait(0.5)
-        connectToSwitch()
+        connectToSwitch() -- Réessaie plus tard
         return
     end
     
+    -- Récupère le switch "ESP Players"
     local espSwitch = switches["ESP Players"]
+    
     if espSwitch then
+        -- Quand le switch change d'état
         espSwitch:onToggle(function(state)
-            enabled = state
+            espEnabled = state
             print("📌 ESP Players = " .. tostring(state))
-            if not enabled then
+            
+            if not state then
+                -- Nettoie les ESP si désactivé
                 for _, obj in pairs(espObjects) do
                     pcall(function() obj:Destroy() end)
                 end
@@ -149,23 +165,23 @@ local function connectToSwitch()
             end
         end)
         
-        -- Applique l'état initial
-        enabled = espSwitch:getState()
-        print("   ✅ [ESP_PLAYERS] Connecté au switch")
+        -- Applique l'état actuel du switch
+        espEnabled = espSwitch:getState()
+        print("   ✅ [ESP_PLAYERS] Connecté au switch (état: " .. tostring(espEnabled) .. ")")
     else
-        print("   ⚠️ [ESP_PLAYERS] Switch ESP Players non trouvé")
+        print("   ❌ [ESP_PLAYERS] Switch 'ESP Players' non trouvé")
     end
 end
 
 -- ============================================
--- BOUCLE
+-- BOUCLE PRINCIPALE
 -- ============================================
 RunService.RenderStepped:Connect(updateESP)
 
 -- ============================================
 -- INITIALISATION
 -- ============================================
-task.wait(1)
+task.wait(1) -- Attend que le menu soit chargé
 connectToSwitch()
 
 print("   ✅ [ESP_PLAYERS] Prêt !")
