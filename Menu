@@ -1,6 +1,5 @@
 --[[
-    🔥 MENU - Style Project Reverse (CORRIGÉ)
-    Switchs sous forme de tables avec méthodes
+    🔥 MENU - Version Simplifiée
 ]]
 
 print("   📦 [MENU] Création de l'interface...")
@@ -82,8 +81,8 @@ end)
 -- MENU PRINCIPAL
 -- ============================================
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 450, 0, 480)
-mainFrame.Position = UDim2.new(0.5, -225, 0.5, -240)
+mainFrame.Size = UDim2.new(0, 450, 0, 500)
+mainFrame.Position = UDim2.new(0.5, -225, 0.5, -250)
 mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
 mainFrame.BackgroundTransparency = 0
 mainFrame.BorderSizePixel = 0
@@ -110,7 +109,6 @@ local topCorner = Instance.new("UICorner")
 topCorner.CornerRadius = UDim.new(0, 14)
 topCorner.Parent = topBar
 
--- Titre principal
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -60, 0, 28)
 titleLabel.Position = UDim2.new(0, 16, 0, 8)
@@ -122,11 +120,10 @@ titleLabel.TextSize = 18
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.Parent = topBar
 
--- Sous-titre
 local subTitle = Instance.new("TextLabel")
 subTitle.Size = UDim2.new(1, -60, 0, 16)
 subTitle.Position = UDim2.new(0, 16, 0, 30)
-subTitle.Text = "By Project Reverse [Egorikusa]"
+subTitle.Text = "By Project Reverse"
 subTitle.TextColor3 = Color3.fromRGB(150, 150, 200)
 subTitle.BackgroundTransparency = 1
 subTitle.Font = Enum.Font.Gotham
@@ -134,7 +131,6 @@ subTitle.TextSize = 11
 subTitle.TextXAlignment = Enum.TextXAlignment.Left
 subTitle.Parent = topBar
 
--- Bouton fermer
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 34, 0, 34)
 closeBtn.Position = UDim2.new(1, -42, 0, 8)
@@ -147,13 +143,6 @@ closeBtn.Parent = topBar
 
 closeBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = false
-end)
-
-closeBtn.MouseEnter:Connect(function()
-    closeBtn.TextColor3 = Color3.fromRGB(255, 50, 50)
-end)
-closeBtn.MouseLeave:Connect(function()
-    closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
 end)
 
 -- ============================================
@@ -194,13 +183,15 @@ local currentCategory = nil
 local categoryData = {
     {name = "Gameplay", icon = "🎮"},
     {name = "ESP", icon = "👁"},
-    {name = "Auto Farm", icon = "⚡"},
+    {name = "Inventory", icon = "📦"},
+    {name = "AutoFarm", icon = "⚡"},
     {name = "Coin Farm", icon = "💰"},
+    {name = "Shop", icon = "🛒"},
     {name = "Trade Helper", icon = "🤝"},
-    {name = "Inventory Helper", icon = "📦"},
+    {name = "Specifie", icon = "🔧"},
+    {name = "Inventory Helper", icon = "📋"},
     {name = "Spawner & Crate Opener", icon = "📦"},
     {name = "Misc", icon = "⚙"},
-    {name = "Valentine Farm", icon = "❤"},
 }
 
 -- ============================================
@@ -208,7 +199,7 @@ local categoryData = {
 -- ============================================
 local function createCategoryButton(name, icon, yPos)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -8, 0, 38)
+    btn.Size = UDim2.new(1, -8, 0, 36)
     btn.Position = UDim2.new(0, 4, 0, yPos)
     btn.Text = icon .. "  " .. name
     btn.TextColor3 = Color3.fromRGB(200, 200, 220)
@@ -216,11 +207,10 @@ local function createCategoryButton(name, icon, yPos)
     btn.BackgroundTransparency = 0
     btn.BorderSizePixel = 0
     btn.Font = Enum.Font.Gotham
-    btn.TextSize = 13
+    btn.TextSize = 12
     btn.TextXAlignment = Enum.TextXAlignment.Left
     btn.Parent = categoryList
     btn.ZIndex = 999
-    btn.Name = "Category_" .. name
     
     local btnCorner = Instance.new("UICorner")
     btnCorner.CornerRadius = UDim.new(0, 8)
@@ -241,17 +231,16 @@ local function createCategoryButton(name, icon, yPos)
 end
 
 -- ============================================
--- FONCTION POUR CRÉER UN SWITCH (retourne une table)
+-- FONCTION POUR CRÉER UN SWITCH (visible)
 -- ============================================
 local function createSwitch(parent, yPos, labelText, descriptionText, defaultState)
     local isOn = defaultState or false
     local callbacks = {}
     
-    -- Conteneur
     local container = Instance.new("Frame")
-    container.Size = UDim2.new(1, -12, 0, 44)
+    container.Size = UDim2.new(1, -12, 0, 48)
     container.Position = UDim2.new(0, 6, 0, yPos)
-    container.BackgroundColor3 = Color3.fromRGB(25, 25, 48)
+    container.BackgroundColor3 = Color3.fromRGB(28, 28, 52)
     container.BackgroundTransparency = 0
     container.BorderSizePixel = 0
     container.Parent = parent
@@ -262,22 +251,22 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
     
     -- Label
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0, 160, 1, 0)
-    label.Position = UDim2.new(0, 12, 0, 0)
+    label.Size = UDim2.new(0, 170, 0, 20)
+    label.Position = UDim2.new(0, 12, 0, 4)
     label.Text = labelText
-    label.TextColor3 = Color3.fromRGB(220, 220, 240)
+    label.TextColor3 = Color3.fromRGB(230, 230, 250)
     label.BackgroundTransparency = 1
     label.Font = Enum.Font.GothamBold
-    label.TextSize = 13
+    label.TextSize = 14
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = container
     
     -- Description
     local desc = Instance.new("TextLabel")
-    desc.Size = UDim2.new(0, 160, 0, 14)
-    desc.Position = UDim2.new(0, 12, 0, 24)
+    desc.Size = UDim2.new(0, 170, 0, 14)
+    desc.Position = UDim2.new(0, 12, 0, 26)
     desc.Text = descriptionText
-    desc.TextColor3 = Color3.fromRGB(130, 130, 180)
+    desc.TextColor3 = Color3.fromRGB(140, 140, 190)
     desc.BackgroundTransparency = 1
     desc.Font = Enum.Font.Gotham
     desc.TextSize = 10
@@ -286,9 +275,9 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
     
     -- Fond du switch
     local switchBg = Instance.new("Frame")
-    switchBg.Size = UDim2.new(0, 44, 0, 24)
-    switchBg.Position = UDim2.new(1, -54, 0.5, -12)
-    switchBg.BackgroundColor3 = isOn and Color3.fromRGB(60, 60, 180) or Color3.fromRGB(60, 60, 80)
+    switchBg.Size = UDim2.new(0, 50, 0, 28)
+    switchBg.Position = UDim2.new(1, -60, 0.5, -14)
+    switchBg.BackgroundColor3 = isOn and Color3.fromRGB(60, 60, 200) or Color3.fromRGB(60, 60, 80)
     switchBg.BackgroundTransparency = 0
     switchBg.BorderSizePixel = 0
     switchBg.Parent = container
@@ -299,8 +288,8 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
     
     -- Curseur
     local cursor = Instance.new("Frame")
-    cursor.Size = UDim2.new(0, 20, 0, 20)
-    cursor.Position = isOn and UDim2.new(1, -22, 0.5, -10) or UDim2.new(0, 2, 0.5, -10)
+    cursor.Size = UDim2.new(0, 24, 0, 24)
+    cursor.Position = isOn and UDim2.new(1, -26, 0.5, -12) or UDim2.new(0, 2, 0.5, -12)
     cursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     cursor.BackgroundTransparency = 0
     cursor.BorderSizePixel = 0
@@ -310,20 +299,20 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
     cursorCorner.CornerRadius = UDim.new(1, 0)
     cursorCorner.Parent = cursor
     
-    -- Fonction toggle interne
+    -- Toggle
     local function toggleSwitch()
         isOn = not isOn
         if isOn then
-            switchBg.BackgroundColor3 = Color3.fromRGB(60, 60, 180)
-            cursor.Position = UDim2.new(1, -22, 0.5, -10)
+            switchBg.BackgroundColor3 = Color3.fromRGB(60, 60, 200)
+            cursor.Position = UDim2.new(1, -26, 0.5, -12)
         else
             switchBg.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
-            cursor.Position = UDim2.new(0, 2, 0.5, -10)
+            cursor.Position = UDim2.new(0, 2, 0.5, -12)
         end
         return isOn
     end
     
-    -- Événements de clic
+    -- Clic sur le fond
     switchBg.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             local newState = toggleSwitch()
@@ -342,9 +331,7 @@ local function createSwitch(parent, yPos, labelText, descriptionText, defaultSta
         end
     end)
     
-    -- ============================================
-    -- RETOURNE UNE TABLE AVEC LES MÉTHODES
-    -- ============================================
+    -- Objet switch
     local switchObject = {}
     
     function switchObject:setState(state)
@@ -380,13 +367,15 @@ local allSwitches = {}
 for _, data in ipairs(categoryData) do
     local btn = createCategoryButton(data.name, data.icon, yOffset)
     categoryButtons[data.name] = btn
-    yOffset = yOffset + 44
+    yOffset = yOffset + 40
     
-    local content = Instance.new("Frame")
+    local content = Instance.new("ScrollingFrame")
     content.Size = UDim2.new(1, 0, 1, 0)
     content.BackgroundTransparency = 1
     content.Visible = false
     content.Parent = contentContainer
+    content.CanvasSize = UDim2.new(0, 0, 0, 400)
+    content.ScrollBarThickness = 3
     content.Name = "Content_" .. data.name
     
     categoryContent[data.name] = content
@@ -401,8 +390,8 @@ end
 local gpSwitches = {}
 local gpData = {
     {name = "Auto Click", desc = "Auto click on targets", y = 10, default = false},
-    {name = "Auto Collect", desc = "Auto collect coins", y = 58, default = false},
-    {name = "Auto Quest", desc = "Auto complete quests", y = 106, default = false},
+    {name = "Auto Collect", desc = "Auto collect coins", y = 65, default = false},
+    {name = "Auto Quest", desc = "Auto complete quests", y = 120, default = false},
 }
 for _, d in ipairs(gpData) do
     local sw = createSwitch(categoryContent["Gameplay"], d.y, d.name, d.desc, d.default)
@@ -414,9 +403,9 @@ allSwitches["Gameplay"] = gpSwitches
 local espSwitches = {}
 local espData = {
     {name = "ESP Players", desc = "Highlight players", y = 10, default = false},
-    {name = "ESP Weapons", desc = "Highlight dropped weapons", y = 58, default = false},
-    {name = "Show Distance", desc = "Display distance to players", y = 106, default = false},
-    {name = "Show Health", desc = "Display health bars", y = 154, default = false},
+    {name = "ESP Weapons", desc = "Highlight dropped weapons", y = 65, default = false},
+    {name = "Show Distance", desc = "Display distance to players", y = 120, default = false},
+    {name = "Show Health", desc = "Display health bars", y = 175, default = false},
 }
 for _, d in ipairs(espData) do
     local sw = createSwitch(categoryContent["ESP"], d.y, d.name, d.desc, d.default)
@@ -427,7 +416,7 @@ allSwitches["ESP"] = espSwitches
 -- Légende ESP
 local espLegend = Instance.new("Frame")
 espLegend.Size = UDim2.new(1, -12, 0, 34)
-espLegend.Position = UDim2.new(0, 6, 0, 210)
+espLegend.Position = UDim2.new(0, 6, 0, 235)
 espLegend.BackgroundColor3 = Color3.fromRGB(25, 25, 48)
 espLegend.BackgroundTransparency = 0
 espLegend.BorderSizePixel = 0
@@ -446,23 +435,35 @@ espLegendText.Font = Enum.Font.Gotham
 espLegendText.TextSize = 11
 espLegendText.Parent = espLegend
 
--- === AUTO FARM ===
+-- === INVENTORY ===
+local invSwitches = {}
+local invData = {
+    {name = "Auto Collect", desc = "Auto collect items", y = 10, default = false},
+    {name = "Auto Sell", desc = "Auto sell duplicates", y = 65, default = false},
+}
+for _, d in ipairs(invData) do
+    local sw = createSwitch(categoryContent["Inventory"], d.y, d.name, d.desc, d.default)
+    invSwitches[d.name] = sw
+end
+allSwitches["Inventory"] = invSwitches
+
+-- === AUTOFARM ===
 local afSwitches = {}
 local afData = {
     {name = "Auto Farm", desc = "Auto farm coins", y = 10, default = false},
-    {name = "Auto Rebirth", desc = "Auto rebirth when available", y = 58, default = false},
+    {name = "Auto Rebirth", desc = "Auto rebirth when available", y = 65, default = false},
 }
 for _, d in ipairs(afData) do
-    local sw = createSwitch(categoryContent["Auto Farm"], d.y, d.name, d.desc, d.default)
+    local sw = createSwitch(categoryContent["AutoFarm"], d.y, d.name, d.desc, d.default)
     afSwitches[d.name] = sw
 end
-allSwitches["Auto Farm"] = afSwitches
+allSwitches["AutoFarm"] = afSwitches
 
 -- === COIN FARM ===
 local cfSwitches = {}
 local cfData = {
     {name = "Coin Farm", desc = "Farm coins automatically", y = 10, default = false},
-    {name = "Double Coins", desc = "Double coin multiplier", y = 58, default = false},
+    {name = "Double Coins", desc = "Double coin multiplier", y = 65, default = false},
 }
 for _, d in ipairs(cfData) do
     local sw = createSwitch(categoryContent["Coin Farm"], d.y, d.name, d.desc, d.default)
@@ -470,11 +471,23 @@ for _, d in ipairs(cfData) do
 end
 allSwitches["Coin Farm"] = cfSwitches
 
+-- === SHOP ===
+local shopSwitches = {}
+local shopData = {
+    {name = "Auto Buy", desc = "Auto buy items", y = 10, default = false},
+    {name = "Auto Upgrade", desc = "Auto upgrade items", y = 65, default = false},
+}
+for _, d in ipairs(shopData) do
+    local sw = createSwitch(categoryContent["Shop"], d.y, d.name, d.desc, d.default)
+    shopSwitches[d.name] = sw
+end
+allSwitches["Shop"] = shopSwitches
+
 -- === TRADE HELPER ===
 local thSwitches = {}
 local thData = {
     {name = "Auto Trade", desc = "Auto accept trades", y = 10, default = false},
-    {name = "Trade Alerts", desc = "Show trade notifications", y = 58, default = false},
+    {name = "Trade Alerts", desc = "Show trade notifications", y = 65, default = false},
 }
 for _, d in ipairs(thData) do
     local sw = createSwitch(categoryContent["Trade Helper"], d.y, d.name, d.desc, d.default)
@@ -482,11 +495,23 @@ for _, d in ipairs(thData) do
 end
 allSwitches["Trade Helper"] = thSwitches
 
+-- === SPECIFIE ===
+local spSwitches = {}
+local spData = {
+    {name = "Option 1", desc = "Custom option 1", y = 10, default = false},
+    {name = "Option 2", desc = "Custom option 2", y = 65, default = false},
+}
+for _, d in ipairs(spData) do
+    local sw = createSwitch(categoryContent["Specifie"], d.y, d.name, d.desc, d.default)
+    spSwitches[d.name] = sw
+end
+allSwitches["Specifie"] = spSwitches
+
 -- === INVENTORY HELPER ===
 local ihSwitches = {}
 local ihData = {
     {name = "Show Rarity", desc = "Display item rarity", y = 10, default = false},
-    {name = "Auto Sell", desc = "Auto sell common items", y = 58, default = false},
+    {name = "Auto Craft", desc = "Auto craft items", y = 65, default = false},
 }
 for _, d in ipairs(ihData) do
     local sw = createSwitch(categoryContent["Inventory Helper"], d.y, d.name, d.desc, d.default)
@@ -498,7 +523,7 @@ allSwitches["Inventory Helper"] = ihSwitches
 local scSwitches = {}
 local scData = {
     {name = "Auto Open", desc = "Auto open crates", y = 10, default = false},
-    {name = "Spawn Items", desc = "Spawn items automatically", y = 58, default = false},
+    {name = "Spawn Items", desc = "Spawn items automatically", y = 65, default = false},
 }
 for _, d in ipairs(scData) do
     local sw = createSwitch(categoryContent["Spawner & Crate Opener"], d.y, d.name, d.desc, d.default)
@@ -510,25 +535,13 @@ allSwitches["Spawner & Crate Opener"] = scSwitches
 local miscSwitches = {}
 local miscData = {
     {name = "Hide UI", desc = "Hide game UI", y = 10, default = false},
-    {name = "FPS Boost", desc = "Boost FPS", y = 58, default = false},
+    {name = "FPS Boost", desc = "Boost FPS", y = 65, default = false},
 }
 for _, d in ipairs(miscData) do
     local sw = createSwitch(categoryContent["Misc"], d.y, d.name, d.desc, d.default)
     miscSwitches[d.name] = sw
 end
 allSwitches["Misc"] = miscSwitches
-
--- === VALENTINE FARM ===
-local vfSwitches = {}
-local vfData = {
-    {name = "Valentine Farm", desc = "Farm Valentine event", y = 10, default = false},
-    {name = "Auto Gift", desc = "Auto send gifts", y = 58, default = false},
-}
-for _, d in ipairs(vfData) do
-    local sw = createSwitch(categoryContent["Valentine Farm"], d.y, d.name, d.desc, d.default)
-    vfSwitches[d.name] = sw
-end
-allSwitches["Valentine Farm"] = vfSwitches
 
 -- ============================================
 -- NAVIGATION ENTRE CATÉGORIES
