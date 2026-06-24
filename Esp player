@@ -1,6 +1,5 @@
 --[[
-    🔥 ESP PLAYERS - SOLUTION ULTIME
-    Détection par outils + mémorisation
+    🔥 ESP PLAYERS - Connecté aux switches
 ]]
 
 print("   📦 [ESP_PLAYERS] Démarrage...")
@@ -13,18 +12,18 @@ local espObjects = {}
 local enabled = false
 local screenGui = nil
 
--- MÉMOIRE DES RÔLES (persistant)
+-- MÉMOIRE DES RÔLES
 local roleMemory = {}
 
 -- COULEURS
 local COLORS = {
-    Murder = Color3.fromRGB(255, 0, 0),    -- Rouge
-    Sherif = Color3.fromRGB(0, 100, 255),  -- Bleu
-    Hero = Color3.fromRGB(255, 215, 0),    -- Jaune
-    Innocent = Color3.fromRGB(0, 255, 0),  -- Vert
+    Murder = Color3.fromRGB(255, 0, 0),
+    Sherif = Color3.fromRGB(0, 100, 255),
+    Hero = Color3.fromRGB(255, 215, 0),
+    Innocent = Color3.fromRGB(0, 255, 0),
 }
 
--- ===== DÉTECTION DU RÔLE PAR LES OUTILS =====
+-- ===== DÉTECTION DU RÔLE =====
 local function detectRoleByTools(character)
     if not character then return nil end
     
@@ -52,75 +51,25 @@ local function detectRoleByTools(character)
     return nil
 end
 
--- ===== OBTENIR LE RÔLE (avec mémorisation) =====
 local function getPlayerRole(targetPlayer)
     local name = targetPlayer.Name
     
-    -- 1. Si déjà en mémoire, on renvoie
     if roleMemory[name] then
         return roleMemory[name]
     end
     
-    -- 2. Détection par les outils
     if targetPlayer.Character then
         local role = detectRoleByTools(targetPlayer.Character)
         if role then
             roleMemory[name] = role
-            print("   ✅ " .. name .. " → " .. role .. " (détecté par outil)")
+            print("   ✅ " .. name .. " → " .. role)
             return role
         end
     end
     
-    -- 3. Par défaut : Innocent (mais on vérifie les autres joueurs)
-    -- Si c'est un joueur sans arme, on le met Innocent
     roleMemory[name] = "Innocent"
-    print("   👤 " .. name .. " → Innocent (par défaut)")
     return "Innocent"
 end
-
--- ===== FORCER LA MISE À JOUR DES RÔLES =====
-local function updateAllRoles()
-    for _, p in pairs(Players:GetPlayers()) do
-        if p ~= player and p.Character then
-            local role = detectRoleByTools(p.Character)
-            if role then
-                roleMemory[p.Name] = role
-            end
-        end
-    end
-end
-
--- ===== QUAND UN JOUEUR CHANGE D'OUTIL =====
-local function onToolAdded(player, tool)
-    task.wait(0.5) -- Attendre que l'outil soit bien équipé
-    local role = detectRoleByTools(player.Character)
-    if role then
-        roleMemory[player.Name] = role
-        print("   🔄 " .. player.Name .. " → " .. role .. " (outil équipé)")
-    end
-end
-
--- Détecter les changements d'outils
-for _, p in pairs(Players:GetPlayers()) do
-    if p.Character then
-        p.Character.ChildAdded:Connect(function(child)
-            if child:IsA("Tool") then
-                onToolAdded(p, child)
-            end
-        end)
-    end
-end
-
-Players.PlayerAdded:Connect(function(p)
-    p.CharacterAdded:Connect(function(char)
-        char.ChildAdded:Connect(function(child)
-            if child:IsA("Tool") then
-                task.wait(0.5)
-                onToolAdded(p, child)
-            end
-        end)
-    end)
-end)
 
 -- ===== MISE À JOUR ESP =====
 local function updateESP()
@@ -136,9 +85,6 @@ local function updateESP()
         screenGui = player.PlayerGui:FindFirstChild("ESPPanel")
         if not screenGui then return end
     end
-    
-    -- Met à jour les rôles périodiquement
-    updateAllRoles()
     
     for _, p in pairs(Players:GetPlayers()) do
         if p ~= player and p.Character and p.Character:FindFirstChild("Humanoid") then
@@ -168,7 +114,6 @@ local function updateESP()
         end
     end
     
-    -- Nettoyage
     for i = #espObjects, 1, -1 do
         local obj = espObjects[i]
         if obj:IsA("Highlight") then
@@ -180,53 +125,48 @@ local function updateESP()
     end
 end
 
--- ===== FONCTIONS PUBLIQUES =====
-local function toggle()
-    enabled = not enabled
-    if not enabled then
-        for _, obj in pairs(espObjects) do
-            pcall(function() obj:Destroy() end)
-        end
-        espObjects = {}
+-- ============================================
+-- 🔹 CONNEXION AU SWITCH
+-- ============================================
+local function connectToSwitch()
+    local switches = _G.ESP and _G.ESP.switches and _G.ESP.switches.visual
+    if not switches then
+        task.wait(0.5)
+        connectToSwitch()
+        return
     end
-    return enabled
+    
+    local espSwitch = switches["ESP Players"]
+    if espSwitch then
+        espSwitch:onToggle(function(state)
+            enabled = state
+            print("📌 ESP Players = " .. tostring(state))
+            if not enabled then
+                for _, obj in pairs(espObjects) do
+                    pcall(function() obj:Destroy() end)
+                end
+                espObjects = {}
+            end
+        end)
+        
+        -- Applique l'état initial
+        enabled = espSwitch:getState()
+        print("   ✅ [ESP_PLAYERS] Connecté au switch")
+    else
+        print("   ⚠️ [ESP_PLAYERS] Switch ESP Players non trouvé")
+    end
 end
 
-local function isEnabled()
-    return enabled
-end
-
--- ===== BOUCLE =====
+-- ============================================
+-- BOUCLE
+-- ============================================
 RunService.RenderStepped:Connect(updateESP)
 
--- Met à jour les rôles au démarrage
+-- ============================================
+-- INITIALISATION
+-- ============================================
 task.wait(1)
-updateAllRoles()
-
--- ===== STOCKAGE =====
-_G.ESP.modules.ESPPlayers = {
-    toggle = toggle,
-    isEnabled = isEnabled
-}
-
--- ===== CONNEXION AU BOUTON =====
-local function connectButton()
-    local buttons = _G.ESP and _G.ESP.buttons
-    if buttons and buttons["ESP Players"] then
-        buttons["ESP Players"].button.MouseButton1Click:Connect(function()
-            local state = toggle()
-            buttons["ESP Players"].button.Text = (state and "☑ " or "◻ ") .. "ESP Players"
-            buttons["ESP Players"].button.BackgroundColor3 = state and buttons["ESP Players"].color or Color3.fromRGB(50, 50, 75)
-            print("📌 ESP Players = " .. tostring(state))
-        end)
-        print("   ✅ [ESP_PLAYERS] Connecté au bouton")
-    else
-        task.wait(0.5)
-        connectButton()
-    end
-end
-connectButton()
+connectToSwitch()
 
 print("   ✅ [ESP_PLAYERS] Prêt !")
-print("   📌 Détection par outils + mémorisation")
 return true
